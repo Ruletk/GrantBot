@@ -1,14 +1,13 @@
 from aiogram import Dispatcher
-from aiogram.dispatcher.filters import Command
 from aiogram.types import Message
-from sqlalchemy.ext.asyncio import AsyncSession
-from src.db.dals import UserDAL
-from src.db.models import User
-from src.api.requester import Api
+from aiohttp.web_exceptions import HTTPNotFound
+
 from src.api.exceptions import ServerError
+from src.api.requester import Api
 from src.bot.handlers.common_handlers import register_common_handlers
 from src.bot.messages import messages
-from aiohttp.web_exceptions import HTTPNotFound
+from src.db.dals import UserDAL
+from src.db.models import User
 
 
 def register_handlers(dp: Dispatcher):

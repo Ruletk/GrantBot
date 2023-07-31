@@ -1,9 +1,10 @@
-from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram import types
+from aiogram.dispatcher.middlewares import BaseMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.api.requester import Api
-from src.db.engine import engine
 from src.db.dals import UserDAL
+from src.db.engine import engine
 
 
 class ResourceMiddleware(BaseMiddleware):

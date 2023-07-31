@@ -1,5 +1,7 @@
-from aiohttp import ClientSession, ContentTypeError
+from aiohttp import ClientSession
+from aiohttp import ContentTypeError
 from aiohttp.web_exceptions import HTTPNotFound
+
 from src.api.exceptions import ServerError
 from src.db.models import User
 
