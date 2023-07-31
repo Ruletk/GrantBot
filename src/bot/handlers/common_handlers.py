@@ -1,12 +1,14 @@
 from aiogram import Dispatcher
 from aiogram.dispatcher.filters import Command
 from aiogram.types import Message
-from src.bot.keyboards.language import language_kb
-from src.bot.keyboards.default import ru_default_kb, kz_default_kb
-from src.db.dals import UserDAL
-from src.bot.messages import messages
-from src.db.models import User
+
 from src.api.requester import Api
+from src.bot.keyboards.default import kz_default_kb
+from src.bot.keyboards.default import ru_default_kb
+from src.bot.keyboards.language import language_kb
+from src.bot.messages import messages
+from src.db.dals import UserDAL
+from src.db.models import User
 
 
 def register_common_handlers(dp: Dispatcher):

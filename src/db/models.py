@@ -1,6 +1,8 @@
-from sqlalchemy import Column, String, Integer
-from sqlalchemy.orm import declarative_base
+from sqlalchemy import Column
+from sqlalchemy import Integer
+from sqlalchemy import String
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import declarative_base
 
 
 Base = declarative_base()

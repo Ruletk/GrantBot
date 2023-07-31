@@ -1,4 +1,5 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import KeyboardButton
+from aiogram.types import ReplyKeyboardMarkup
 
 
 ru_lang = KeyboardButton("Русский")

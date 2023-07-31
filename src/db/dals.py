@@ -2,7 +2,6 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db.models import User
-from sqlalchemy.exc import IntegrityError
 
 
 class UserDAL:
