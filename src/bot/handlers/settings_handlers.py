@@ -4,6 +4,7 @@ from aiogram.types import Message
 
 from src.api.requester import Api
 from src.bot.keyboards.default import ru_default_kb
+from src.bot.keyboards.settings import ru_cancel_kb
 from src.bot.keyboards.settings import ru_settings_kb
 from src.bot.keyboards.settings import ru_type_kb
 from src.bot.messages import messages
@@ -27,13 +28,6 @@ def register_settings_handlers(dp: Dispatcher):
         await state.reset_state()
         await msg.answer(messages["ru_back"], reply_markup=ru_settings_kb)
 
-    @dp.message_handler(lambda msg: msg.text == "Указать тип теста")
-    async def set_type(
-        msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
-    ):
-        await States.set_type.set()
-        await msg.answer(messages["ru_set_type"], reply_markup=ru_type_kb)
-
     @dp.message_handler(state=States.set_type)
     async def set_type_handler(
         msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
@@ -53,13 +47,6 @@ def register_settings_handlers(dp: Dispatcher):
         await msg.answer(messages["ru_set_type_success"], reply_markup=ru_settings_kb)
         await state.reset_state()
 
-    @dp.message_handler(lambda msg: msg.text == "Указать год")
-    async def set_year(
-        msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
-    ):
-        await States.set_year.set()
-        await msg.answer(messages["ru_set_year"])
-
     @dp.message_handler(state=States.set_year)
     async def set_year_handler(
         msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
@@ -74,13 +61,6 @@ def register_settings_handlers(dp: Dispatcher):
                 messages["ru_set_year_success"], reply_markup=ru_settings_kb
             )
             await state.reset_state()
-
-    @dp.message_handler(lambda msg: msg.text == "Указать ИИН")
-    async def set_iin(
-        msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
-    ):
-        await States.set_iin.set()
-        await msg.answer(messages["ru_set_iin"])
 
     @dp.message_handler(state=States.set_iin)
     async def set_iin_handler(
@@ -98,13 +78,6 @@ def register_settings_handlers(dp: Dispatcher):
             )
             await state.reset_state()
 
-    @dp.message_handler(lambda msg: msg.text == "Указать ИКТ")
-    async def set_ikt(
-        msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
-    ):
-        await States.set_ikt.set()
-        await msg.answer(messages["ru_set_ikt"])
-
     @dp.message_handler(state=States.set_ikt)
     async def set_ikt_handler(
         msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
@@ -120,3 +93,33 @@ def register_settings_handlers(dp: Dispatcher):
                 messages["ru_set_ikt_success"], reply_markup=ru_settings_kb
             )
             await state.reset_state()
+
+
+def register_settings(dp: Dispatcher):
+    @dp.message_handler(lambda msg: msg.text == "Указать тип теста")
+    async def set_type(
+        msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
+    ):
+        await States.set_type.set()
+        await msg.answer(messages["ru_set_type"], reply_markup=ru_type_kb)
+
+    @dp.message_handler(lambda msg: msg.text == "Указать год")
+    async def set_year(
+        msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
+    ):
+        await States.set_year.set()
+        await msg.answer(messages["ru_set_year"], reply_markup=ru_cancel_kb)
+
+    @dp.message_handler(lambda msg: msg.text == "Указать ИИН")
+    async def set_iin(
+        msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
+    ):
+        await States.set_iin.set()
+        await msg.answer(messages["ru_set_iin"], reply_markup=ru_cancel_kb)
+
+    @dp.message_handler(lambda msg: msg.text == "Указать ИКТ")
+    async def set_ikt(
+        msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
+    ):
+        await States.set_ikt.set()
+        await msg.answer(messages["ru_set_ikt"], reply_markup=ru_cancel_kb)

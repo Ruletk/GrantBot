@@ -21,6 +21,4 @@ ru_cancel_kb = ReplyKeyboardMarkup(resize_keyboard=True).add(back)
 ent = KeyboardButton("ЕНТ/КТ")
 mag = KeyboardButton("Магистратура/Докторантура")
 nkt = KeyboardButton("НКТ")
-ru_type_kb = (
-    ReplyKeyboardMarkup(resize_keyboard=True).add(ent).add(mag).add(nkt).add(back)
-)
+ru_type_kb = ReplyKeyboardMarkup(resize_keyboard=True).add(ent, mag, nkt, back)

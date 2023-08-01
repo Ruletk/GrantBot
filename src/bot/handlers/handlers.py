@@ -5,6 +5,7 @@ from aiohttp.web_exceptions import HTTPNotFound
 from src.api.exceptions import ServerError
 from src.api.requester import Api
 from src.bot.handlers.common_handlers import register_common_handlers
+from src.bot.handlers.settings_handlers import register_settings
 from src.bot.handlers.settings_handlers import register_settings_handlers
 from src.bot.keyboards.settings import ru_settings_kb
 from src.bot.messages import messages
@@ -15,6 +16,7 @@ from src.db.models import User
 def register_handlers(dp: Dispatcher):
     register_common_handlers(dp)
     register_russian_handlers(dp)
+    register_settings(dp)
     register_settings_handlers(dp)
 
 
