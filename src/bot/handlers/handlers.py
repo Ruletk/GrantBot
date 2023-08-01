@@ -32,8 +32,16 @@ def register_russian_handlers(dp: Dispatcher):
         msg: Message, user: User, user_dal: UserDAL, api: Api
     ):
         try:
-            res = await api.get_grant_result(user)
-            await msg.answer(res)
+            data = await user_dal.get_cached(msg.from_user.id, user)
+            if data:
+                res = data
+
+            else:
+                res, status = await api.get_grant_result(user)
+                res |= {"status": status}
+                await user_dal.cache(msg.from_user.id, user, res)
+            if res.get("status", 0) == 404:
+                raise HTTPNotFound()
         except ValueError:
             await msg.answer(messages["ru_field_request"])
         except HTTPNotFound:
@@ -41,3 +49,5 @@ def register_russian_handlers(dp: Dispatcher):
         except ServerError as ex:
             print(ex)
             await msg.answer(messages["ru_server_error"])
+        else:
+            await msg.answer(str(res))
