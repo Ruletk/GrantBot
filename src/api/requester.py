@@ -12,7 +12,6 @@ class Api:
         self._http_client = ClientSession()
 
     async def _make_request(self, method, url_part):
-        print("send request")
         try:
             response = await self._http_client.request(
                 method=method, url=f"{API_BASE_URL}/{url_part}"
