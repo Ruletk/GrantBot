@@ -17,6 +17,7 @@ class UserDAL:
         user = User(telegram_id=telegram_id)
         await user.save(self.session)
 
-    async def update_user(self, telegram_id: int, **kwargs) -> User:
-        user = await self.get_user(telegram_id)
+    async def update_user(self, telegram_id: int, user=None, **kwargs) -> User:
+        if not user:
+            user = await self.get_user(telegram_id)
         await user.update(self.session, **kwargs)
