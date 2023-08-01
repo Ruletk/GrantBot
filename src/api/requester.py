@@ -1,6 +1,5 @@
 from aiohttp import ClientSession
 from aiohttp import ContentTypeError
-from aiohttp.web_exceptions import HTTPNotFound
 
 from src.api.exceptions import ServerError
 from src.db.models import User
@@ -13,6 +12,7 @@ class Api:
         self._http_client = ClientSession()
 
     async def _make_request(self, method, url_part):
+        print("send request")
         try:
             response = await self._http_client.request(
                 method=method, url=f"{API_BASE_URL}/{url_part}"
@@ -20,17 +20,14 @@ class Api:
         except Exception as e:
             print(e)
 
-        if response.status == 404:
-            raise HTTPNotFound()
-
-        if response.status != 200:
+        if response.status not in [200, 404]:
             details = await response.text()
             raise ServerError(f"Server returned {response.status}, details: {details}")
         try:
             data = await response.json()
         except ContentTypeError as e:
             print(e)
-        return data
+        return data, response.status
 
     async def get_grant_result(self, user: User):
         if not user or not all([user.iin, user.ikt, user.year, user.type]):

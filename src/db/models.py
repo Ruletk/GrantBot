@@ -1,6 +1,7 @@
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import String
+from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import declarative_base
 
@@ -40,10 +41,4 @@ class User(ModelBase):
     year = Column(Integer)
     type = Column(Integer)  # 1=ENT/KT, 2=Mag/Doct, 3=NKT
     language = Column(String(2), default="ru")
-
-    async def get_type(self):
-        if self.type == 1:
-            return "ENT/KT"
-        if self.type == 2:
-            return "Magistratura/Doctorantura"
-        return "NKT"
+    last_request = Column(JSON(False))
