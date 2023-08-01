@@ -33,7 +33,7 @@ class Api:
         return data
 
     async def get_grant_result(self, user: User):
-        if not all([user.iin, user.ikt, user.year, user.type]):
+        if not user or not all([user.iin, user.ikt, user.year, user.type]):
             raise ValueError("Field should be filled")
         url = f"grant/test-type/{user.type}/test-year/{user.year}/student/{user.ikt}/iin/{user.iin}"
         return await self._make_request("GET", url)

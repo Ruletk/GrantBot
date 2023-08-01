@@ -34,6 +34,8 @@ def register_russian_handlers(dp: Dispatcher):
         try:
             res = await api.get_grant_result(user)
             await msg.answer(res)
+        except ValueError:
+            await msg.answer(messages["ru_field_request"])
         except HTTPNotFound:
             await msg.answer(messages["ru_results_not_found"])
         except ServerError as ex:
