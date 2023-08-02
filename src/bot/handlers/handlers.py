@@ -21,13 +21,13 @@ def register_handlers(dp: Dispatcher):
 
 
 def register_russian_handlers(dp: Dispatcher):
-    @dp.message_handler(lambda msg: msg.text == "Настройки")
+    @dp.message(lambda msg: msg.text == "Настройки")
     async def ru_settings_message_handler(
         msg: Message, user: User, user_dal: UserDAL, api: Api
     ):
         await msg.answer("Меню настроек", reply_markup=ru_settings_kb)
 
-    @dp.message_handler(lambda msg: msg.text == "Получить результат")
+    @dp.message(lambda msg: msg.text == "Получить результат")
     async def ru_get_grant_results(
         msg: Message, user: User, user_dal: UserDAL, api: Api
     ):

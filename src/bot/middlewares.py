@@ -1,5 +1,11 @@
-from aiogram import types
-from aiogram.dispatcher.middlewares import BaseMiddleware
+from typing import Any
+from typing import Awaitable
+from typing import Callable
+from typing import Coroutine
+from typing import Dict
+
+from aiogram import BaseMiddleware
+from aiogram.types import TelegramObject
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.requester import Api
@@ -8,6 +14,20 @@ from src.db.engine import engine
 
 
 class ResourceMiddleware(BaseMiddleware):
+    async def __call__(
+        self,
+        handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
+        event: TelegramObject,
+        data: Dict[str, Any],
+    ) -> Coroutine[Any, Any, Any]:
+        resources = await self._provide_resources()
+        data.update(resources)
+
+        result = await handler(event, data)
+
+        await self._cleanup(data)
+        return result
+
     @staticmethod
     async def _provide_api_client() -> Api:
         client = Api()
@@ -35,30 +55,18 @@ class ResourceMiddleware(BaseMiddleware):
             api: Api = data["api"]
             await api.close_session()
 
-    async def on_pre_process_message(self, update: types.Message, data: dict):
-        resources = await self._provide_resources()
-        data.update(resources)
-        return data
-
-    async def on_pre_process_callback_query(
-        self, query: types.CallbackQuery, data: dict
-    ):
-        resources = await self._provide_resources()
-        data.update(resources)
-        return data
-
-    async def on_post_process_callback_query(
-        self, query: types.CallbackQuery, data_from_handler: list, data: dict
-    ):
-        await self._cleanup()
-
-    async def on_post_process_message(
-        self, message: types.Message, data_from_handler: list, data: dict
-    ):
-        await self._cleanup(data)
-
 
 class UserMiddlwware(BaseMiddleware):
+    async def __call__(
+        self,
+        handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
+        event: TelegramObject,
+        data: Dict[str, Any],
+    ) -> Coroutine[Any, Any, Any]:
+        data = await self._provide_user(data.get("event_from_user").id, data)
+
+        return await handler(event, data)
+
     async def _provide_user(self, user_id: int, data: dict):
         if "db_session" not in data:
             raise RuntimeError("AsyncSession not found.")
@@ -80,11 +88,3 @@ class UserMiddlwware(BaseMiddleware):
         data["api"] = api
 
         return data
-
-    async def on_pre_process_message(self, message: types.Message, data: dict):
-        return await self._provide_user(message.from_user.id, data)
-
-    async def on_pre_process_callback_query(
-        self, query: types.CallbackQuery, data: dict
-    ):
-        return await self._provide_user(query.from_user.id, data)

@@ -1,7 +1,13 @@
-from aiogram import executor
+import asyncio
 
+from src.bot import bot
 from src.bot import dp
 
 
+async def main():
+    await bot.delete_webhook(drop_pending_updates=True)
+    await dp.start_polling(bot)
+
+
 if __name__ == "__main__":
-    executor.start_polling(dp, skip_updates=True)
+    asyncio.run(main())
