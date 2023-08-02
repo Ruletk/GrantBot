@@ -20,6 +20,6 @@ dp.message.outer_middleware(UserMiddlwware())
 dp.message.outer_middleware(CustomI18NMiddleware(i18n=i18n))
 
 
-from .handlers.handlers import register_handlers
+from src.bot.handlers import router
 
-register_handlers(dp)
+dp.include_router(router)

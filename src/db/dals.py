@@ -1,3 +1,4 @@
+import datetime
 import json
 from time import time
 
@@ -23,7 +24,9 @@ class UserDAL:
     async def update_user(self, telegram_id: int, user=None, **kwargs) -> User:
         if not user:
             user = await self.get_user(telegram_id)
-        await user.update(self.session, **kwargs)
+        await user.update(
+            self.session, updated_at=datetime.datetime.now(), last_request={}, **kwargs
+        )
 
     async def delete_user(self, telegram_id: int = None, user=None) -> User:
         if not user:

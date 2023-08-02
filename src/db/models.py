@@ -1,7 +1,9 @@
 import datetime
+
 from sqlalchemy import Column
+from sqlalchemy import DateTime
 from sqlalchemy import Integer
-from sqlalchemy import String, DateTime
+from sqlalchemy import String
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import declarative_base

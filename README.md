@@ -10,7 +10,7 @@ Enter commands one by one before start coding
 
 
 
-To add new text to translate, enter 
+To add new text to translate, enter
 
     pybabel extract -F .\babel.cfg -o .\locales\messages.pot .
 
