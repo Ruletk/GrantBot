@@ -1,5 +1,6 @@
 from aiogram import Dispatcher
-from aiogram.dispatcher import FSMContext
+from aiogram import F
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
 from src.api.requester import Api
@@ -14,21 +15,21 @@ from src.db.models import User
 
 
 def register_settings_handlers(dp: Dispatcher):
-    @dp.message_handler(lambda msg: msg.text == "Отмена", state="*")
+    @dp.message(F.text == "Отмена")
     async def cancel(
         msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
     ):
-        await state.reset_state()
+        await state.clear()
         await msg.answer(messages["ru_reset_state"], reply_markup=ru_default_kb)
 
-    @dp.message_handler(lambda msg: msg.text == "Назад", state="*")
+    @dp.message(F.text == "Назад")
     async def back(
         msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
     ):
-        await state.reset_state()
+        await state.clear()
         await msg.answer(messages["ru_back"], reply_markup=ru_settings_kb)
 
-    @dp.message_handler(state=States.set_type)
+    @dp.message(States.set_type)
     async def set_type_handler(
         msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
     ):
@@ -45,9 +46,9 @@ def register_settings_handlers(dp: Dispatcher):
             tp = 3
         await user_dal.update_user(msg.from_user.id, user=user, type=tp)
         await msg.answer(messages["ru_set_type_success"], reply_markup=ru_settings_kb)
-        await state.reset_state()
+        await state.clear()
 
-    @dp.message_handler(state=States.set_year)
+    @dp.message(States.set_year)
     async def set_year_handler(
         msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
     ):
@@ -60,9 +61,9 @@ def register_settings_handlers(dp: Dispatcher):
             await msg.answer(
                 messages["ru_set_year_success"], reply_markup=ru_settings_kb
             )
-            await state.reset_state()
+            await state.clear()
 
-    @dp.message_handler(state=States.set_iin)
+    @dp.message(States.set_iin)
     async def set_iin_handler(
         msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
     ):
@@ -76,9 +77,9 @@ def register_settings_handlers(dp: Dispatcher):
             await msg.answer(
                 messages["ru_set_iin_success"], reply_markup=ru_settings_kb
             )
-            await state.reset_state()
+            await state.clear()
 
-    @dp.message_handler(state=States.set_ikt)
+    @dp.message(States.set_ikt)
     async def set_ikt_handler(
         msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
     ):
@@ -92,34 +93,34 @@ def register_settings_handlers(dp: Dispatcher):
             await msg.answer(
                 messages["ru_set_ikt_success"], reply_markup=ru_settings_kb
             )
-            await state.reset_state()
+            await state.clear()
 
 
 def register_settings(dp: Dispatcher):
-    @dp.message_handler(lambda msg: msg.text == "Указать тип теста")
+    @dp.message(F.text == "Указать тип теста")
     async def set_type(
         msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
     ):
-        await States.set_type.set()
+        await state.set_state(States.set_type)
         await msg.answer(messages["ru_set_type"], reply_markup=ru_type_kb)
 
-    @dp.message_handler(lambda msg: msg.text == "Указать год")
+    @dp.message(F.text == "Указать год")
     async def set_year(
         msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
     ):
-        await States.set_year.set()
+        await state.set_state(States.set_year)
         await msg.answer(messages["ru_set_year"], reply_markup=ru_cancel_kb)
 
-    @dp.message_handler(lambda msg: msg.text == "Указать ИИН")
+    @dp.message(F.text == "Указать ИИН")
     async def set_iin(
         msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
     ):
-        await States.set_iin.set()
+        await state.set_state(States.set_iin)
         await msg.answer(messages["ru_set_iin"], reply_markup=ru_cancel_kb)
 
-    @dp.message_handler(lambda msg: msg.text == "Указать ИКТ")
+    @dp.message(F.text == "Указать ИКТ")
     async def set_ikt(
         msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
     ):
-        await States.set_ikt.set()
+        await state.set_state(States.set_ikt)
         await msg.answer(messages["ru_set_ikt"], reply_markup=ru_cancel_kb)

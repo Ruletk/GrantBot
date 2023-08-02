@@ -4,21 +4,21 @@ from aiogram.types import ReplyKeyboardMarkup
 
 # RU LANG
 
-type = KeyboardButton("Указать тип теста")
-year = KeyboardButton("Указать год")
-iin = KeyboardButton("Указать ИИН")
-ikt = KeyboardButton("Указать ИКТ")
-cancel = KeyboardButton("Отмена")
+type = KeyboardButton(text="Указать тип теста")
+year = KeyboardButton(text="Указать год")
+iin = KeyboardButton(text="Указать ИИН")
+ikt = KeyboardButton(text="Указать ИКТ")
+cancel = KeyboardButton(text="Отмена")
 
-ru_settings_kb = (
-    ReplyKeyboardMarkup(resize_keyboard=True).row(type, year, iin, ikt).add(cancel)
+ru_settings_kb = ReplyKeyboardMarkup(
+    keyboard=[[type, year, iin, ikt], [cancel]], resize_keyboard=True
 )
 
-back = KeyboardButton("Назад")
-ru_cancel_kb = ReplyKeyboardMarkup(resize_keyboard=True).add(back)
+back = KeyboardButton(text="Назад")
+ru_cancel_kb = ReplyKeyboardMarkup(keyboard=[[back]], resize_keyboard=True)
 
 
-ent = KeyboardButton("ЕНТ/КТ")
-mag = KeyboardButton("Магистратура/Докторантура")
-nkt = KeyboardButton("НКТ")
-ru_type_kb = ReplyKeyboardMarkup(resize_keyboard=True).add(ent, mag, nkt, back)
+ent = KeyboardButton(text="ЕНТ/КТ")
+mag = KeyboardButton(text="Магистратура/Докторантура")
+nkt = KeyboardButton(text="НКТ")
+ru_type_kb = ReplyKeyboardMarkup(keyboard=[[ent, mag, nkt, back]], resize_keyboard=True)
