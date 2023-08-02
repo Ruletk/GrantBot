@@ -2,50 +2,55 @@ from aiogram import Dispatcher
 from aiogram import F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
+from aiogram.utils.i18n import gettext as _
+from aiogram.utils.i18n import lazy_gettext as __
 
 from src.api.requester import Api
-from src.bot.keyboards.default import ru_default_kb
-from src.bot.keyboards.settings import ru_cancel_kb
-from src.bot.keyboards.settings import ru_settings_kb
-from src.bot.keyboards.settings import ru_type_kb
-from src.bot.messages import messages
+from src.bot.keyboards.default import default_kb_gen
+from src.bot.keyboards.language import language_kb
+from src.bot.keyboards.settings import cancel_kb_gen
+from src.bot.keyboards.settings import settings_kb_gen
+from src.bot.keyboards.settings import type_kb_gen
 from src.bot.states import States
+from src.bot.text import Text
 from src.db.dals import UserDAL
 from src.db.models import User
 
 
 def register_settings_handlers(dp: Dispatcher):
-    @dp.message(F.text == "Отмена")
+    @dp.message(F.text == __(Text.cancel))
     async def cancel(
         msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
     ):
         await state.clear()
-        await msg.answer(messages["ru_reset_state"], reply_markup=ru_default_kb)
+        await msg.answer(_(Text.cancel), reply_markup=default_kb_gen())
 
-    @dp.message(F.text == "Назад")
+    @dp.message(F.text == __(Text.back))
     async def back(
         msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
     ):
         await state.clear()
-        await msg.answer(messages["ru_back"], reply_markup=ru_settings_kb)
+        await msg.answer(_(Text.back), reply_markup=settings_kb_gen())
 
     @dp.message(States.set_type)
     async def set_type_handler(
         msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
     ):
-        if msg.text.strip() not in ["ЕНТ/КТ", "Магистратура/Докторантура", "НКТ"]:
-            await msg.answer(
-                messages["ru_set_type_error_by_user"], reply_markup=ru_type_kb
-            )
+        if msg.text.strip() not in [
+            _(Text.set_ent_btn),
+            _(Text.set_mag_btn),
+            _(Text.set_nkt_btn),
+        ]:
+            await msg.answer(_(Text.set_type_error_by_user), reply_markup=type_kb_gen())
             return
-        if msg.text.strip() == "ЕНТ/КТ":
+        if msg.text.strip() == _(Text.set_ent_btn):
             tp = 1
-        elif msg.text.strip() == "Магистратура/Докторантура":
+        elif msg.text.strip() == _(Text.set_mag_btn):
             tp = 2
         else:
             tp = 3
         await user_dal.update_user(msg.from_user.id, user=user, type=tp)
-        await msg.answer(messages["ru_set_type_success"], reply_markup=ru_settings_kb)
+        await msg.answer(_(Text.set_type_success), reply_markup=settings_kb_gen())
         await state.clear()
 
     @dp.message(States.set_year)
@@ -55,12 +60,10 @@ def register_settings_handlers(dp: Dispatcher):
         try:
             value = int(msg.text.strip())
         except ValueError:
-            msg.answer(messages["ru_set_year_error_by_user"])
+            msg.answer(_(Text.set_year_error_by_user))
         else:
             await user_dal.update_user(msg.from_user.id, user=user, year=value)
-            await msg.answer(
-                messages["ru_set_year_success"], reply_markup=ru_settings_kb
-            )
+            await msg.answer(_(Text.set_year_success), reply_markup=settings_kb_gen())
             await state.clear()
 
     @dp.message(States.set_iin)
@@ -70,13 +73,12 @@ def register_settings_handlers(dp: Dispatcher):
         try:
             iin = msg.text.strip()
             assert len(iin) == 12
+            # TODO: make fully assert iin: "qwertyuiopas" also works
         except AssertionError:
-            await msg.answer(messages["ru_iin_error_by_user"])
+            await msg.answer(_(Text.set_iin_error_by_user))
         else:
             await user_dal.update_user(msg.from_user.id, user, iin=iin)
-            await msg.answer(
-                messages["ru_set_iin_success"], reply_markup=ru_settings_kb
-            )
+            await msg.answer(_(Text.set_iin_success), reply_markup=settings_kb_gen())
             await state.clear()
 
     @dp.message(States.set_ikt)
@@ -86,41 +88,46 @@ def register_settings_handlers(dp: Dispatcher):
         try:
             ikt = msg.text.strip()
             assert len(ikt) == 9
+            # TODO: make fully assert ikt: "qwertyuio" also works
         except AssertionError:
-            await msg.answer(messages["ru_ikt_error_by_user"])
+            await msg.answer(_(Text.set_ikt_error_by_user))
         else:
             await user_dal.update_user(msg.from_user.id, user, ikt=ikt)
-            await msg.answer(
-                messages["ru_set_ikt_success"], reply_markup=ru_settings_kb
-            )
+            await msg.answer(_(Text.set_ikt_success), reply_markup=settings_kb_gen())
             await state.clear()
 
 
 def register_settings(dp: Dispatcher):
-    @dp.message(F.text == "Указать тип теста")
+    @dp.message(F.text == __(Text.set_type_btn))
     async def set_type(
         msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
     ):
         await state.set_state(States.set_type)
-        await msg.answer(messages["ru_set_type"], reply_markup=ru_type_kb)
+        await msg.answer(_(Text.set_type), reply_markup=type_kb_gen())
 
-    @dp.message(F.text == "Указать год")
+    @dp.message(F.text == __(Text.set_year_btn))
     async def set_year(
         msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
     ):
         await state.set_state(States.set_year)
-        await msg.answer(messages["ru_set_year"], reply_markup=ru_cancel_kb)
+        await msg.answer(_(Text.set_year), reply_markup=cancel_kb_gen())
 
-    @dp.message(F.text == "Указать ИИН")
+    @dp.message(F.text == __(Text.set_iin_btn))
     async def set_iin(
         msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
     ):
         await state.set_state(States.set_iin)
-        await msg.answer(messages["ru_set_iin"], reply_markup=ru_cancel_kb)
+        await msg.answer(_(Text.set_iin), reply_markup=cancel_kb_gen())
 
-    @dp.message(F.text == "Указать ИКТ")
+    @dp.message(F.text == __(Text.set_ikt_btn))
     async def set_ikt(
         msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
     ):
         await state.set_state(States.set_ikt)
-        await msg.answer(messages["ru_set_ikt"], reply_markup=ru_cancel_kb)
+        await msg.answer(_(Text.set_ikt), reply_markup=cancel_kb_gen())
+
+    @dp.message(F.text == __(Text.set_change_lang_btn))
+    async def change_lang(
+        msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
+    ):
+        await msg.answer(_(Text.welcome), reply_markup=language_kb)

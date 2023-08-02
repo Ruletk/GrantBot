@@ -1,5 +1,7 @@
 from aiogram import Dispatcher
 from aiogram.types import Message
+from aiogram.utils.i18n import gettext as _
+from aiogram.utils.i18n import lazy_gettext as __
 from aiohttp.web_exceptions import HTTPNotFound
 
 from src.api.exceptions import ServerError
@@ -7,8 +9,8 @@ from src.api.requester import Api
 from src.bot.handlers.common_handlers import register_common_handlers
 from src.bot.handlers.settings_handlers import register_settings
 from src.bot.handlers.settings_handlers import register_settings_handlers
-from src.bot.keyboards.settings import ru_settings_kb
-from src.bot.messages import messages
+from src.bot.keyboards.settings import settings_kb_gen
+from src.bot.text import Text
 from src.db.dals import UserDAL
 from src.db.models import User
 
@@ -21,13 +23,13 @@ def register_handlers(dp: Dispatcher):
 
 
 def register_russian_handlers(dp: Dispatcher):
-    @dp.message(lambda msg: msg.text == "Настройки")
+    @dp.message(lambda msg: msg.text == __(Text.settings_btn))
     async def ru_settings_message_handler(
         msg: Message, user: User, user_dal: UserDAL, api: Api
     ):
-        await msg.answer("Меню настроек", reply_markup=ru_settings_kb)
+        await msg.answer(_(Text.settings_menu), reply_markup=settings_kb_gen())
 
-    @dp.message(lambda msg: msg.text == "Получить результат")
+    @dp.message(lambda msg: msg.text == __(Text.test_result_btn))
     async def ru_get_grant_results(
         msg: Message, user: User, user_dal: UserDAL, api: Api
     ):
@@ -43,11 +45,11 @@ def register_russian_handlers(dp: Dispatcher):
             if res.get("status", 0) == 404:
                 raise HTTPNotFound()
         except ValueError:
-            await msg.answer(messages["ru_field_request"])
+            await msg.answer(_(Text.field_required))
         except HTTPNotFound:
-            await msg.answer(messages["ru_results_not_found"])
+            await msg.answer(_(Text.results_not_found))
         except ServerError as ex:
             print(ex)
-            await msg.answer(messages["ru_server_error"])
+            await msg.answer(_(Text.server_error))
         else:
             await msg.answer(str(res))
