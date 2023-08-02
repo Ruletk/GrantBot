@@ -1,0 +1,144 @@
+# Kazakh translations for PROJECT.
+# Copyright (C) 2023 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2023-08-03 00:35+0600\n"
+"PO-Revision-Date: 2023-08-03 00:45+0600\n"
+"Last-Translator: \n"
+"Language-Team: kk <LL@li.org>\n"
+"Language: kk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Babel 2.9.1\n"
+"X-Generator: Poedit 3.3.2\n"
+
+#: src/bot/text.py:5
+msgid "Привет. Выбери язык"
+msgstr "Сәлеметсіз бе. Тіліңізді таңдаңыз"
+
+#: src/bot/text.py:6
+msgid "Язык успешно изменен"
+msgstr "Жыл сәтті өзгертілді"
+
+#: src/bot/text.py:7
+msgid "Меню настроек"
+msgstr "Параметрлер мәзірі"
+
+#: src/bot/text.py:8
+msgid ""
+"Результаты конкурса грантов не найдены. Проверьте правильность заполненных данных.\n"
+"Также возможно, что результаты конкурса грантов еще не вышли"
+msgstr ""
+"Грант конкурсының қорытындысы табылмады. Толтырылған деректердің дұрыстығын тексеріңіз.\n"
+"Сондай-ақ гранттық байқаудың қорытындысы әлі шықпаған болуы мүмкін"
+
+#: src/bot/text.py:12
+msgid "Ошибка. Сначала введите свои данные через настройки"
+msgstr "Қате. Алдымен параметрлер арқылы мәліметтеріңізді енгізіңіз"
+
+#: src/bot/text.py:13
+msgid "Ошибка на стороне сервера"
+msgstr "Сервер тарапындағы қате"
+
+#: src/bot/text.py:14
+msgid "Отмена"
+msgstr "Болдырмау"
+
+#: src/bot/text.py:15
+msgid "Возврат"
+msgstr "Қайту"
+
+#: src/bot/text.py:16
+msgid "Укажите тип теста"
+msgstr "Сынақ түрін көрсетіңіз"
+
+#: src/bot/text.py:17
+msgid "Выберите кнопку на панели кнопок"
+msgstr "Түйме жолағындағы түймені таңдаңыз"
+
+#: src/bot/text.py:18
+msgid "Тип теста успешно изменен"
+msgstr "Сынақ түрі сәтті өзгертілді"
+
+#: src/bot/text.py:19
+msgid "Введите год в виде числа без лишних символов, пробелов. Пример: 2023"
+msgstr "Жылды қосымша таңбаларсыз немесе бос орындарсыз сан ретінде енгізіңіз. Мысалы: 2023"
+
+#: src/bot/text.py:20
+msgid "Ошибка, неправильно введен год"
+msgstr "Қате, қате енгізілген жыл"
+
+#: src/bot/text.py:21
+msgid "Год успешно изменен"
+msgstr "Жыл сәтті өзгерді"
+
+#: src/bot/text.py:22
+msgid "Введите ИИН без лишних символов, пробелов"
+msgstr "ЖСН-ді қосымша таңбаларсыз, бос орындарсыз енгізіңіз"
+
+#: src/bot/text.py:23
+msgid "Ошибка. Неправильно введен ИИН"
+msgstr "Қате. ЖСН қате енгізілді"
+
+#: src/bot/text.py:24
+msgid "Введите ИКТ без лишних символов, пробелов"
+msgstr "АКТ қосымша таңбаларсыз, бос орындарсыз енгізіңіз"
+
+#: src/bot/text.py:25
+msgid "ИИН успешно изменен"
+msgstr "ЖСН сәтті өзгертілді"
+
+#: src/bot/text.py:26
+msgid "Ошибка. Неправильно введен ИКТ"
+msgstr "Қате. ТЖК қате енгізілген"
+
+#: src/bot/text.py:27
+msgid "ИКТ успешно изменен"
+msgstr "ТЖК сәтті өзгерді"
+
+#: src/bot/text.py:29
+msgid "Настройки"
+msgstr "Параметрлер"
+
+#: src/bot/text.py:30
+msgid "Получить результат"
+msgstr "Нәтиже алыңыз"
+
+#: src/bot/text.py:31
+msgid "Указать тип теста"
+msgstr "Сынақ түрін көрсетіңіз"
+
+#: src/bot/text.py:32
+msgid "Указать год"
+msgstr "Жылды көрсетіңіз"
+
+#: src/bot/text.py:33
+msgid "Указать ИИН"
+msgstr "ЖСН көрсетіңіз"
+
+#: src/bot/text.py:34
+msgid "Указать ИКТ"
+msgstr "ТЖК көрсетіңіз"
+
+#: src/bot/text.py:35
+msgid "ЕНТ/КТ"
+msgstr "ҰБТ/КТ"
+
+#: src/bot/text.py:36
+msgid "Магистратура/Докторантура"
+msgstr "Магистратура/Докторантура"
+
+#: src/bot/text.py:37
+msgid "НКТ"
+msgstr "ҰБТ"
+
+#: src/bot/text.py:38
+msgid "Сменить язык"
+msgstr "Тілді таңдаңыз"

@@ -6,6 +6,7 @@ from typing import Dict
 
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
+from aiogram.utils.i18n.middleware import I18nMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.requester import Api
@@ -88,3 +89,10 @@ class UserMiddlwware(BaseMiddleware):
         data["api"] = api
 
         return data
+
+
+class CustomI18NMiddleware(I18nMiddleware):
+    async def get_locale(self, event: TelegramObject, data: Dict[str, Any]) -> str:
+        user = data.get("user", None)
+        lang = getattr(user, "language", "ru")
+        return lang
