@@ -1,7 +1,16 @@
-Python 3.11
+Use python 3.11
+Enter commands one by one before start coding
 
 
-To add new text to translate, enter
+    python -m venv .venv
+    .\.venv\Scripts\activate
+    pip install -r requirements.txt
+    pre-commit init
+    alembic init migrations
+
+
+
+To add new text to translate, enter 
 
     pybabel extract -F .\babel.cfg -o .\locales\messages.pot .
 

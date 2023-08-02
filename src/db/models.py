@@ -1,6 +1,7 @@
+import datetime
 from sqlalchemy import Column
 from sqlalchemy import Integer
-from sqlalchemy import String
+from sqlalchemy import String, DateTime
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import declarative_base
@@ -12,6 +13,12 @@ Base = declarative_base()
 class ModelBase(Base):
     __abstract__ = True
     json_arguments = ()
+
+    id = Column(Integer, primary_key=True)
+    created_at = Column(DateTime, default=datetime.datetime.now())
+    updated_at = Column(
+        DateTime, default=datetime.datetime.now(), onupdate=datetime.datetime.now()
+    )
 
     async def save(self, async_session: AsyncSession) -> None:
         async_session.add(self)
@@ -32,9 +39,8 @@ class ModelBase(Base):
 
 class User(ModelBase):
     __tablename__ = "users"
-    json_arguments = ("telegram_id", "iin", "ikt", "year")
+    json_arguments = ("telegram_id", "iin", "ikt", "year", "type")
 
-    id = Column(Integer, primary_key=True)
     telegram_id = Column(Integer, unique=True, nullable=False)
     iin = Column(String)
     ikt = Column(String)
