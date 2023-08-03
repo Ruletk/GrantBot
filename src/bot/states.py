@@ -7,3 +7,5 @@ class States(StatesGroup):
     set_ikt = State()
     set_iin = State()
     set_year = State()
+    delete_me = State()
+    confirm_policy = State()

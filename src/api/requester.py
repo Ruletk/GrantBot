@@ -2,7 +2,7 @@ from aiohttp import ClientSession
 from aiohttp import ContentTypeError
 
 from src.api.exceptions import ServerError
-from src.db.models import User
+from src.db.dals import UserDAL
 
 API_BASE_URL = "https://grant.testcenter.kz/certificate/api/v1"
 
@@ -28,10 +28,11 @@ class Api:
             print(e)
         return data, response.status
 
-    async def get_grant_result(self, user: User):
-        if not user or not all([user.iin, user.ikt, user.year, user.type]):
+    async def get_grant_result(self, user_dal: UserDAL):
+        iin, ikt, type, year = await user_dal.get_all_data()
+        if not all([iin, ikt, type, year]):
             raise ValueError("Field should be filled")
-        url = f"grant/test-type/{user.type}/test-year/{user.year}/student/{user.ikt}/iin/{user.iin}"
+        url = f"grant/test-type/{type}/test-year/{year}/student/{ikt}/iin/{iin}"
         return await self._make_request("GET", url)
 
     async def close_session(self):

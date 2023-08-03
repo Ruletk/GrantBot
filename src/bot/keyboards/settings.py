@@ -14,10 +14,12 @@ def settings_kb_gen():
     iin = KeyboardButton(text=_(Text.set_iin_btn))
     ikt = KeyboardButton(text=_(Text.set_ikt_btn))
     change_lang = KeyboardButton(text=_(Text.set_change_lang_btn))
+    delete_me = KeyboardButton(text=_(Text.delete_me_btn))
     cancel = KeyboardButton(text=_(Text.cancel))
 
     return ReplyKeyboardMarkup(
-        keyboard=[[type, year, iin, ikt], [change_lang], [cancel]], resize_keyboard=True
+        keyboard=[[type, year, iin, ikt], [change_lang], [delete_me], [cancel]],
+        resize_keyboard=True,
     )
 
 
@@ -32,3 +34,9 @@ def type_kb_gen():
     mag = KeyboardButton(text=_(Text.set_mag_btn))
     nkt = KeyboardButton(text=_(Text.set_nkt_btn))
     return ReplyKeyboardMarkup(keyboard=[[ent, mag, nkt, back]], resize_keyboard=True)
+
+
+def delete_me_kb_gen():
+    sure = KeyboardButton(text=_(Text.confirm_deletion_btn))
+    back = KeyboardButton(text=_(Text.back))
+    return ReplyKeyboardMarkup(keyboard=[[sure], [back]], resize_keyboard=True)

@@ -6,12 +6,21 @@ from aiogram.utils.i18n import gettext as _
 from src.bot.text import Text
 
 
+def privacy_kb_gen(locale=None):
+    if not locale:
+        locale = get_i18n().current_locale
+    button_confirm = KeyboardButton(text=_(Text.policy_btn_confirm, locale=locale))
+    return ReplyKeyboardMarkup(keyboard=[[button_confirm]], resize_keyboard=True)
+
+
 def default_kb_gen(locale=None):
     if not locale:
         locale = get_i18n().current_locale
     button_settings = KeyboardButton(text=_(Text.settings_btn, locale=locale))
     button_get_result = KeyboardButton(text=_(Text.test_result_btn, locale=locale))
+    button_info = KeyboardButton(text=_(Text.info_btn, locale=locale))
 
     return ReplyKeyboardMarkup(
-        keyboard=[[button_get_result, button_settings]], resize_keyboard=True
+        keyboard=[[button_get_result, button_settings], [button_info]],
+        resize_keyboard=True,
     )

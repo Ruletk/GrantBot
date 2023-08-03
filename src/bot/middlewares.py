@@ -66,7 +66,9 @@ class UserMiddlwware(BaseMiddleware):
     ) -> Coroutine[Any, Any, Any]:
         data = await self._provide_user(data.get("event_from_user").id, data)
 
-        return await handler(event, data)
+        res = await handler(event, data)
+
+        return res
 
     async def _provide_user(self, user_id: int, data: dict):
         if "db_session" not in data:
@@ -84,7 +86,6 @@ class UserMiddlwware(BaseMiddleware):
         if user is None:
             await user_dal.create_user(user_id)
 
-        data["user"] = user
         data["user_dal"] = user_dal
         data["api"] = api
 
@@ -93,6 +94,6 @@ class UserMiddlwware(BaseMiddleware):
 
 class CustomI18NMiddleware(I18nMiddleware):
     async def get_locale(self, event: TelegramObject, data: Dict[str, Any]) -> str:
-        user = data.get("user", None)
+        user = data.get("user_dal").user
         lang = getattr(user, "language", "ru")
         return lang
