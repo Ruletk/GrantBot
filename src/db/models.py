@@ -1,5 +1,6 @@
 import datetime
 
+from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import DateTime
 from sqlalchemy import Integer
@@ -50,3 +51,4 @@ class User(ModelBase):
     type = Column(Integer)  # 1=ENT/KT, 2=Mag/Doct, 3=NKT
     language = Column(String(2), default="ru")
     last_request = Column(JSON(False))
+    policy_confirm = Column(Boolean, default=False)

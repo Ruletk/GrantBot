@@ -10,4 +10,4 @@ from .welcome_handlers import welcome_router
 from .info_handlers import info_router
 
 
-router.include_routers(main_router, settings_router, welcome_router, info_router)
+router.include_routers(welcome_router, main_router, settings_router, info_router)
