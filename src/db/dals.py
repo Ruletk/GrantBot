@@ -31,7 +31,13 @@ class UserDAL:
     async def delete_user(self, telegram_id: int = None, user=None) -> User:
         if not user:
             user = await self.get_user(telegram_id)
-        await user.delete(self.session)
+        await user.update(
+            async_session=self.session,
+            iin=None,
+            ikt=None,
+            year=None,
+            type=None,
+        )
 
     async def get_cached(self, telegram_id: int, user=None) -> dict | None:
         if not user:

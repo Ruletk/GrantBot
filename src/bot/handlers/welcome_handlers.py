@@ -23,7 +23,7 @@ async def start_message(msg: Message, user: User, user_dal: UserDAL, api: Api):
 async def russian_message(msg: Message, user: User, user_dal: UserDAL, api: Api):
     await user_dal.update_user(msg.from_user.id, language="ru")
     await msg.answer(
-        _(Text.language_change, locale="ru"),
+        _(Text.policy, locale="ru"),
         reply_markup=default_kb_gen(locale="ru"),
     )
 
@@ -32,6 +32,6 @@ async def russian_message(msg: Message, user: User, user_dal: UserDAL, api: Api)
 async def kazakh_message(msg: Message, user: User, user_dal: UserDAL, api: Api):
     await user_dal.update_user(msg.from_user.id, language="kk")
     await msg.answer(
-        _(Text.language_change, locale="kk"),
+        _(Text.policy, locale="kk"),
         reply_markup=default_kb_gen(locale="kk"),
     )

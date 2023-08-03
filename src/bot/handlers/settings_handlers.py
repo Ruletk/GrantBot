@@ -9,6 +9,7 @@ from src.api.requester import Api
 from src.bot.keyboards.default import default_kb_gen
 from src.bot.keyboards.language import language_kb
 from src.bot.keyboards.settings import cancel_kb_gen
+from src.bot.keyboards.settings import delete_me_kb_gen
 from src.bot.keyboards.settings import settings_kb_gen
 from src.bot.keyboards.settings import type_kb_gen
 from src.bot.states import States
@@ -102,6 +103,26 @@ async def set_ikt_handler(
         await user_dal.update_user(msg.from_user.id, user, ikt=ikt)
         await msg.answer(_(Text.set_ikt_success), reply_markup=settings_kb_gen())
         await state.clear()
+
+
+@settings_router.message(F.text == __(Text.delete_me_btn))
+async def delete_me(
+    msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
+):
+    await state.set_state(States.delete_me)
+    await msg.answer(_(Text.delete_ask), reply_markup=delete_me_kb_gen())
+
+
+@settings_router.message(
+    States.delete_me,
+    F.text == __(Text.confirm_deletion_btn),
+)
+async def confirmed_deletion(
+    msg: Message, user: User, user_dal: UserDAL, api: Api, state: FSMContext
+):
+    await user_dal.delete_user(user=user)
+    await msg.answer(_(Text.delete_success), reply_markup=language_kb)
+    await state.clear()
 
 
 @settings_router.message(F.text == __(Text.set_type_btn))

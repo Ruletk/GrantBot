@@ -11,7 +11,9 @@ def default_kb_gen(locale=None):
         locale = get_i18n().current_locale
     button_settings = KeyboardButton(text=_(Text.settings_btn, locale=locale))
     button_get_result = KeyboardButton(text=_(Text.test_result_btn, locale=locale))
+    button_info = KeyboardButton(text=_(Text.info_btn, locale=locale))
 
     return ReplyKeyboardMarkup(
-        keyboard=[[button_get_result, button_settings]], resize_keyboard=True
+        keyboard=[[button_get_result, button_settings], [button_info]],
+        resize_keyboard=True,
     )

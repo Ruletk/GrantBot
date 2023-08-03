@@ -27,7 +27,7 @@ class ModelBase(Base):
         await async_session.commit()
 
     async def delete(self, async_session: AsyncSession) -> None:
-        async_session.delete(self)
+        await async_session.delete(self)
         await async_session.commit()
 
     async def update(self, async_session: AsyncSession, **kwargs) -> None:
