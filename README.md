@@ -17,3 +17,7 @@ To add new text to translate, enter
 To sync a new translation file, enter
 
     pybabel update -d locales -D messages -i locales/messages.pot
+
+To commit changes, enter
+
+    pybabel compile -d locales

@@ -11,4 +11,4 @@ info_router = Router(name="info")
 
 @info_router.message(F.text == __(Text.policy_btn))
 async def policy_handler(msg: Message):
-    await msg.answer(_(Text.policy))
+    await msg.answer(_(Text.policy).format(bot=Text.bot_name))

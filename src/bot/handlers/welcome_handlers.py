@@ -26,7 +26,7 @@ async def russian_message(msg: Message, user_dal: UserDAL, state: FSMContext):
     await user_dal.set_lang("ru")
     await state.set_state(States.confirm_policy)
     await msg.answer(
-        _(Text.policy, locale="ru"),
+        _(Text.policy, locale="ru").format(bot=Text.bot_name),
         reply_markup=privacy_kb_gen(locale="ru"),
     )
 
@@ -36,7 +36,7 @@ async def kazakh_message(msg: Message, user_dal: UserDAL, state: FSMContext):
     await user_dal.set_lang("kk")
     await state.set_state(States.confirm_policy)
     await msg.answer(
-        _(Text.policy, locale="kk"),
+        _(Text.policy, locale="kk").format(bot=Text.bot_name),
         reply_markup=privacy_kb_gen(locale="kk"),
     )
 
