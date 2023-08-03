@@ -45,10 +45,7 @@ class UserDAL:
 
     async def delete_user(self) -> None:
         await self._update_user(
-            iin=None,
-            ikt=None,
-            year=None,
-            type=None,
+            iin=None, ikt=None, year=None, type=None, policy_confirm=False
         )
 
     async def get_cached(self) -> dict | None:
