@@ -94,6 +94,6 @@ class UserMiddlwware(BaseMiddleware):
 
 class CustomI18NMiddleware(I18nMiddleware):
     async def get_locale(self, event: TelegramObject, data: Dict[str, Any]) -> str:
-        user = data.get("user_dal").user
+        user = getattr(data.get("user_dal"), "user", None)
         lang = getattr(user, "language", "ru")
         return lang

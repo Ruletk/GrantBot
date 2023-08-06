@@ -1,3 +1,5 @@
+from aiogram.types import InlineKeyboardButton
+from aiogram.types import InlineKeyboardMarkup
 from aiogram.types import KeyboardButton
 from aiogram.types import ReplyKeyboardMarkup
 from aiogram.utils.i18n import get_i18n
@@ -24,3 +26,12 @@ def default_kb_gen(locale=None):
         keyboard=[[button_get_result, button_settings], [button_info]],
         resize_keyboard=True,
     )
+
+
+def download_link_kb_gen(url, locale=None):
+    if not locale:
+        locale = get_i18n().current_locale
+    download_link = InlineKeyboardButton(
+        text=_(Text.download_link_btn, locale=locale), url=url
+    )
+    return InlineKeyboardMarkup(inline_keyboard=[[download_link]])

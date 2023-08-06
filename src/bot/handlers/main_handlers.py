@@ -2,10 +2,9 @@ from aiogram.dispatcher.router import Router
 from aiogram.types import Message
 from aiogram.utils.i18n import gettext as _
 from aiogram.utils.i18n import lazy_gettext as __
-from aiohttp.web_exceptions import HTTPNotFound
 
-from src.api.exceptions import ServerError
 from src.api.requester import Api
+from src.bot.keyboards.default import download_link_kb_gen
 from src.bot.keyboards.info import info_kb_gen
 from src.bot.keyboards.settings import settings_kb_gen
 from src.bot.text import Text
@@ -26,22 +25,27 @@ async def get_grant_results(msg: Message, user_dal: UserDAL, api: Api):
         data = await user_dal.get_cached()
         if data:
             res = data
-
         else:
-            res, status = await api.get_grant_result(user_dal)
-            res |= {"status": status}
+            res = await api.get_grant_result(user_dal)
+            if res.get("data", {}).get("hasGrant"):
+                url = await api.get_download_url(user_dal)
+                res["data"] |= {"url": url}
             await user_dal.cache(res)
-        if res.get("status", 0) == 404:
-            raise HTTPNotFound()
     except ValueError:
         await msg.answer(_(Text.field_required))
-    except HTTPNotFound:
+        return
+    if res.get("errorCode") != 0:
         await msg.answer(_(Text.results_not_found))
-    except ServerError as ex:
-        print(ex)
-        await msg.answer(_(Text.server_error))
+        return
+
+    data = res.get("data", {})
+    if data.get("hasGrant"):
+        await msg.answer(
+            _(Text.congratulation).format(code=data.get("eduProgramCode")),
+            reply_markup=download_link_kb_gen(url=data.get("url")),
+        )
     else:
-        await msg.answer(str(res))
+        await msg.answer(_(Text.sad))
 
 
 @main_router.message(lambda msg: msg.text == __(Text.info_btn))
