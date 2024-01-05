@@ -21,15 +21,10 @@ async def settings_message_handler(msg: Message):
 @main_router.message(lambda msg: msg.text == __(Text.test_result_btn))
 async def get_grant_results(msg: Message, user_dal: UserDAO, api: Api):
     try:
-        data = await user_dal.get_cached()
-        if data:
-            res = data
-        else:
-            res = await api.get_grant_result(user_dal)
-            if res.get("data", {}).get("hasGrant"):
-                url = await api.get_download_url(user_dal)
-                res["data"] |= {"url": url}
-            await user_dal.cache(res)
+        res = await user_dal.get_cached() or await api.get_grant_result(user_dal)
+        if res.get("data", {}).get("hasGrant"):
+            url = await api.get_download_url(user_dal)
+            res["data"] |= {"url": url}
     except ValueError:
         await msg.answer(_(Text.field_required))
         return
