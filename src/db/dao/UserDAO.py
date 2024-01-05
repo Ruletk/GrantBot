@@ -1,27 +1,42 @@
-import datetime
 import json
 from time import time
 
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.db.models import User
+from src.db.models.User import User
+from src.injector.injector import injector
 
 
-class UserDAL:
-    def __init__(self, async_session: AsyncSession):
-        self.session = async_session
+class UserDAO:
+    def __init__(self):
+        self.user = None
+        self.session = injector.get("session")
 
-    async def get_user(self, telegram_id: int) -> User | None:
-        """Use user object only throught dal."""
-        stmt = select(User).where(User.telegram_id == telegram_id)
-        res = await self.session.execute(stmt)
-        self.user = res.scalars().first()
-        return self.user
+    async def _get_user(self, **kwargs) -> User | None:
+        """Generalized method for getting user by any field."""
+        async with self.session() as session:
+            stmt = select(User).filter_by(**kwargs)
+            res = await session.execute(stmt)
+            self.user = res.scalars().first()
+            return self.user
+
+    async def _save_user(self) -> None:
+        async with self.session() as session:
+            session.add(self.user)
+            await session.commit()
+
+    async def _update_user(self, **kwargs) -> None:
+        {setattr(self.user, key, value) for key, value in kwargs.items()}  # noqa
+        await self._save_user()
+
+    async def get_user_by_telegram_id(self, telegram_id: int) -> User | None:
+        """Find user by telegram id."""
+        return await self._get_user(telegram_id=telegram_id)
 
     async def create_user(self, telegram_id: int) -> User | None:
         self.user = User(telegram_id=telegram_id)
-        await self.user.save(self.session)
+        await self._save_user()
+        return self.user
 
     async def set_iin(self, iin: str):
         await self._update_user(iin=iin, last_request={})
@@ -37,11 +52,6 @@ class UserDAL:
 
     async def set_lang(self, lang: str):
         await self._update_user(language=lang, last_request={})
-
-    async def _update_user(self, **kwargs) -> None:
-        await self.user.update(
-            self.session, updated_at=datetime.datetime.now(), **kwargs
-        )
 
     async def delete_user(self) -> None:
         await self._update_user(
@@ -67,5 +77,6 @@ class UserDAL:
     async def policy_confirm(self) -> None:
         await self._update_user(policy_confirm=True)
 
-    async def get_all_data(self) -> tuple[User.iin, User.ikt, User.type, User.year]:
-        return self.user.iin, self.user.ikt, self.user.type, self.user.year
+    async def get_user_language(self) -> str:
+        user = self.user or await self.session.get(User, self.user.id)
+        return user.language or "ru"

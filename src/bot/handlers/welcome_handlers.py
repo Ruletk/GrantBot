@@ -10,8 +10,7 @@ from src.bot.keyboards.default import privacy_kb_gen
 from src.bot.keyboards.language import language_kb
 from src.bot.states import States
 from src.bot.text import Text
-from src.db.dals import UserDAL
-
+from src.db.dao.UserDAO import UserDAO
 
 welcome_router = Router(name="welcome")
 
@@ -22,7 +21,7 @@ async def start_message(msg: Message):
 
 
 @welcome_router.message(F.text == "Русский")
-async def russian_message(msg: Message, user_dal: UserDAL, state: FSMContext):
+async def russian_message(msg: Message, user_dal: UserDAO, state: FSMContext):
     await user_dal.set_lang("ru")
     await state.set_state(States.confirm_policy)
     await msg.answer(
@@ -32,7 +31,7 @@ async def russian_message(msg: Message, user_dal: UserDAL, state: FSMContext):
 
 
 @welcome_router.message(F.text == "Қазақ")
-async def kazakh_message(msg: Message, user_dal: UserDAL, state: FSMContext):
+async def kazakh_message(msg: Message, user_dal: UserDAO, state: FSMContext):
     await user_dal.set_lang("kk")
     await state.set_state(States.confirm_policy)
     await msg.answer(
@@ -42,7 +41,7 @@ async def kazakh_message(msg: Message, user_dal: UserDAL, state: FSMContext):
 
 
 @welcome_router.message(States.confirm_policy)
-async def confirm_privacy(msg: Message, user_dal: UserDAL, state: FSMContext):
+async def confirm_privacy(msg: Message, user_dal: UserDAO, state: FSMContext):
     if msg.text == _(Text.policy_btn_confirm):
         await user_dal.policy_confirm()
         await msg.answer(_(Text.policy_confirm_success), reply_markup=default_kb_gen())

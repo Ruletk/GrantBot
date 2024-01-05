@@ -1,7 +1,7 @@
 from aiohttp import ClientSession
 from aiohttp import ContentTypeError
 
-from src.db.dals import UserDAL
+from src.db.dao.UserDAO import UserDAO
 
 API_BASE_URL = "https://grant.testcenter.kz/certificate/api/v1"
 API_BASE_DOWNLOAD_URL = "https://grant.testcenter.kz/api/v1/certificate"
@@ -23,18 +23,32 @@ class Api:
             print(e)
         return data
 
-    async def get_grant_result(self, user_dal: UserDAL):
-        iin, ikt, type, year = await user_dal.get_all_data()
-        if not all([iin, ikt, type, year]):
+    async def get_grant_result(self, user_dal: UserDAO):
+        data = user_dal.user.to_json()
+        if (
+            not data.get("iin")
+            or not data.get("ikt")
+            or not data.get("type")
+            or not data.get("year")
+        ):
             raise ValueError("Field should be filled")
-        url = f"{API_BASE_URL}/grant/test-type/{type}/test-year/{year}/student/{ikt}/iin/{iin}"
+        url = (
+            f"{API_BASE_URL}/grant"
+            f"/test-type/{data.get('type')}"
+            f"/test-year/{data.get('year')}"
+            f"/student/{data.get('ikt')}"
+            f"/iin/{data.get('iin')}"
+        )
         return await self._make_request("GET", url)
 
-    async def get_download_url(self, user_dal: UserDAL):
-        iin, ikt, type, year = await user_dal.get_all_data()
+    async def get_download_url(self, user_dal: UserDAO):
+        data = user_dal.user.to_json()
         url = (
-            f"{API_BASE_DOWNLOAD_URL}/grant/download-link/test-type"
-            f"/{type}/year/{year}/student/{ikt}/iin/{iin}"
+            f"{API_BASE_DOWNLOAD_URL}/grant/download-link/"
+            f"test-type/{data.get('type')}"
+            f"/year/{data.get('year')}"
+            f"/student/{data.get('ikt')}"
+            f"/iin/{data.get('iin')}"
         )
         data = await self._make_request("GET", url)
 

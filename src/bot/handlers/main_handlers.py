@@ -8,8 +8,7 @@ from src.bot.keyboards.default import download_link_kb_gen
 from src.bot.keyboards.info import info_kb_gen
 from src.bot.keyboards.settings import settings_kb_gen
 from src.bot.text import Text
-from src.db.dals import UserDAL
-
+from src.db.dao.UserDAO import UserDAO
 
 main_router = Router(name="main")
 
@@ -20,7 +19,7 @@ async def settings_message_handler(msg: Message):
 
 
 @main_router.message(lambda msg: msg.text == __(Text.test_result_btn))
-async def get_grant_results(msg: Message, user_dal: UserDAL, api: Api):
+async def get_grant_results(msg: Message, user_dal: UserDAO, api: Api):
     try:
         data = await user_dal.get_cached()
         if data:

@@ -13,8 +13,7 @@ from src.bot.keyboards.settings import settings_kb_gen
 from src.bot.keyboards.settings import type_kb_gen
 from src.bot.states import States
 from src.bot.text import Text
-from src.db.dals import UserDAL
-
+from src.db.dao.UserDAO import UserDAO
 
 settings_router = Router(name="settings")
 
@@ -32,7 +31,7 @@ async def back(msg: Message, state: FSMContext):
 
 
 @settings_router.message(States.set_type)
-async def set_type_handler(msg: Message, user_dal: UserDAL, state: FSMContext):
+async def set_type_handler(msg: Message, user_dal: UserDAO, state: FSMContext):
     if msg.text.strip() not in [
         _(Text.set_ent_btn),
         _(Text.set_mag_btn),
@@ -52,7 +51,7 @@ async def set_type_handler(msg: Message, user_dal: UserDAL, state: FSMContext):
 
 
 @settings_router.message(States.set_year)
-async def set_year_handler(msg: Message, user_dal: UserDAL, state: FSMContext):
+async def set_year_handler(msg: Message, user_dal: UserDAO, state: FSMContext):
     try:
         value = int(msg.text.strip())
     except ValueError:
@@ -64,7 +63,7 @@ async def set_year_handler(msg: Message, user_dal: UserDAL, state: FSMContext):
 
 
 @settings_router.message(States.set_iin)
-async def set_iin_handler(msg: Message, user_dal: UserDAL, state: FSMContext):
+async def set_iin_handler(msg: Message, user_dal: UserDAO, state: FSMContext):
     try:
         iin = msg.text.strip()
         assert len(iin) == 12
@@ -78,7 +77,7 @@ async def set_iin_handler(msg: Message, user_dal: UserDAL, state: FSMContext):
 
 
 @settings_router.message(States.set_ikt)
-async def set_ikt_handler(msg: Message, user_dal: UserDAL, state: FSMContext):
+async def set_ikt_handler(msg: Message, user_dal: UserDAO, state: FSMContext):
     try:
         ikt = msg.text.strip()
         assert len(ikt) == 9
@@ -101,7 +100,7 @@ async def delete_me(msg: Message, state: FSMContext):
     States.delete_me,
     F.text == __(Text.confirm_deletion_btn),
 )
-async def confirmed_deletion(msg: Message, user_dal: UserDAL, state: FSMContext):
+async def confirmed_deletion(msg: Message, user_dal: UserDAO, state: FSMContext):
     await user_dal.delete_user()
     await msg.answer(_(Text.delete_success), reply_markup=language_kb)
     await state.clear()
