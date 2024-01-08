@@ -1,21 +1,27 @@
+from typing import List
+
+from sqlalchemy import BigInteger
 from sqlalchemy import Boolean
-from sqlalchemy import Column
-from sqlalchemy import Integer
 from sqlalchemy import String
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import relationship
 
 from src.db.models.Base import ModelBase
 
 
 class User(ModelBase):
     __tablename__ = "users"
-    JSON_ARGUMENTS = ("telegram_id", "iin", "ikt", "year", "type")
+    JSON_ARGUMENTS = ("id", "telegram_id", "language", "grants")
 
-    telegram_id = Column(Integer, unique=True, nullable=False)
-    iin = Column(String)
-    ikt = Column(String)
-    year = Column(Integer)
-    type = Column(Integer)  # 1=ENT/KT, 2=Mag/Doct, 3=NKT
-    language = Column(String(2), default="ru")
-    last_request = Column(JSON(False))
-    policy_confirm = Column(Boolean, default=False)
+    telegram_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    language: Mapped[str] = mapped_column(String(2), default="ru")
+    policy_confirm: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    grants: Mapped[List["Grant"]] = relationship(back_populates="user")  # noqa F821
+
+    def __repr__(self):
+        return f"<User(id={self.id}, telegram_id={self.telegram_id}, language={self.language})>"
+
+    def __str__(self):
+        return f"<User(id={self.id}, telegram_id={self.telegram_id}, language={self.language})>"
