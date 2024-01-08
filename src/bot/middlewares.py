@@ -44,7 +44,7 @@ class ResourceMiddleware(BaseMiddleware):
             await api.close_session()
 
 
-class UserMiddlwware(BaseMiddleware):
+class UserMiddleware(BaseMiddleware):
     async def __call__(
         self,
         handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
@@ -57,21 +57,31 @@ class UserMiddlwware(BaseMiddleware):
 
         return res
 
-    async def _provide_user(self, user_id: int, data: dict):
-        user_dal = UserDAO()
-        user = await user_dal.get_user_by_telegram_id(user_id)
+    async def _provide_user(self, user_id: int, data: dict) -> dict:
+        """Provide user from database.
+        Get user from DB by telegram_id.
+        If user not found, create new user.
+
+        Then provide UserDAO instance."""
+        user_dao = UserDAO()
+        user = await user_dao.get_user_by_telegram_id(user_id)
 
         if user is None:
-            await user_dal.create_user(user_id)
+            await user_dao.create_user(user_id)
 
-        data["user_dal"] = user_dal
+        data["user_dao"] = user_dao
 
         return data
 
 
 class CustomI18NMiddleware(I18nMiddleware):
+    async def _get_user_dao(self, data) -> UserDAO:
+        user_dao = UserDAO()
+        await user_dao.get_user_by_telegram_id(data["event_from_user"].id)
+        return user_dao
+
     async def get_locale(self, event: TelegramObject, data: Dict[str, Any]) -> str:
-        if "user_dal" not in data:
-            raise RuntimeError("UserDAL not found.")
-        lang = await data["user_dal"].get_user_language()
+        if "user_dao" not in data:
+            data["user_dao"] = await self._get_user_dao(data)
+        lang = await data["user_dao"].get_user_language()
         return lang

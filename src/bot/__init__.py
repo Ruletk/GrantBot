@@ -5,7 +5,7 @@ from aiogram.utils.i18n import I18n
 
 from src.bot.middlewares import CustomI18NMiddleware
 from src.bot.middlewares import ResourceMiddleware
-from src.bot.middlewares import UserMiddlwware
+from src.bot.middlewares import UserMiddleware
 from src.settings import BOT_TOKEN
 
 
@@ -16,8 +16,10 @@ i18n = I18n(path="locales", default_locale="kk", domain="messages")
 
 
 dp.message.outer_middleware(ResourceMiddleware())
-dp.message.outer_middleware(UserMiddlwware())
-dp.message.outer_middleware(CustomI18NMiddleware(i18n=i18n))
+dp.message.outer_middleware(UserMiddleware())
+
+
+CustomI18NMiddleware(i18n=i18n).setup(dp)
 
 
 from src.bot.handlers import router
