@@ -28,7 +28,7 @@ def default_kb_gen(locale=None):
     )
 
 
-def download_link_kb_gen(url, locale=None):
+async def download_link_kb_gen(url, locale=None):
     if not locale:
         locale = get_i18n().current_locale
     download_link = InlineKeyboardButton(

@@ -5,6 +5,7 @@ from aiogram.utils.i18n import gettext as _
 
 from src.bot.callback import GrantInfoActionCallback
 from src.bot.callback import ListGrantCallback
+from src.bot.keyboards.default import download_link_kb_gen
 from src.bot.keyboards.settings import grant_list_action_kb_gen
 from src.bot.keyboards.settings import grant_list_kb_gen
 from src.bot.states import States
@@ -43,8 +44,33 @@ async def delete_grant_handler(
         _(Text.grant_list),
         chat_id=query.message.chat.id,
         message_id=(await state.get_data())["root_message_id"],
-        reply_markup=grant_list_kb_gen(
+        reply_markup=await grant_list_kb_gen(
             await (await state.get_data())["user_dao"].get_grants()
         ),
     )
     await state.set_state(States.list_grants)
+
+
+@management_router.callback_query(
+    GrantInfoActionCallback.filter(F.action == "get_result")
+)
+async def get_grant_result(query, callback_data, state: FSMContext):
+    grant_dao = GrantDAO()
+    await grant_dao.get_grant_by_ikt(callback_data.ikt)
+    res = await grant_dao.get_result()
+    if res.get("error_code", 1) == 1:
+        await query.message.bot.edit_message_text(
+            _(Text.results_not_found),
+            chat_id=query.message.chat.id,
+            message_id=(await state.get_data())["root_message_id"],
+            reply_markup=await grant_list_kb_gen(
+                await (await state.get_data())["user_dao"].get_grants()
+            ),
+        )
+        return
+    await query.bot.edit_message_text(
+        _(Text.congratulation).format(code=res.get("eduProgramCode")),
+        chat_id=query.message.chat.id,
+        message_id=(await state.get_data())["root_message_id"],
+        reply_markup=await download_link_kb_gen(url=res.get("url")),
+    )

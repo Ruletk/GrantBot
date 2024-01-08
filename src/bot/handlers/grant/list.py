@@ -20,7 +20,7 @@ async def list_results(msg: Message, state: FSMContext, user_dao: UserDAO):
     if not grants:
         await msg.answer(_(Text.field_required))
         return
-    await msg.answer(_(Text.grant_list), reply_markup=grant_list_kb_gen(grants))
+    await msg.answer(_(Text.grant_list), reply_markup=await grant_list_kb_gen(grants))
     await state.set_state(States.list_grants)
     await state.set_data({"root_message_id": msg.message_id + 1, "user_dao": user_dao})
 
@@ -31,7 +31,7 @@ async def list_grants_cancel_handler(query, state: FSMContext):
         _(Text.grant_list),
         chat_id=query.message.chat.id,
         message_id=(await state.get_data())["root_message_id"],
-        reply_markup=grant_list_kb_gen(
+        reply_markup=await grant_list_kb_gen(
             await (await state.get_data())["user_dao"].get_grants()
         ),
     )

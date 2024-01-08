@@ -1,11 +1,14 @@
 from aiogram.dispatcher.router import Router
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from aiogram.utils.i18n import gettext as _
 from aiogram.utils.i18n import lazy_gettext as __
 
 from src.api.requester import Api
 from src.bot.keyboards.info import info_kb_gen
+from src.bot.keyboards.settings import grant_list_kb_gen
 from src.bot.keyboards.settings import settings_kb_gen
+from src.bot.states import States
 from src.bot.text import Text
 from src.db.dao.UserDAO import UserDAO
 
@@ -18,11 +21,21 @@ async def settings_message_handler(msg: Message):
 
 
 @main_router.message(lambda msg: msg.text == __(Text.test_result_btn))
-async def get_grant_results(msg: Message, user_dao: UserDAO, api: Api):
+async def get_grant_results(
+    msg: Message, user_dao: UserDAO, api: Api, state: FSMContext
+):
     grants = await user_dao.get_grants()
     if not grants:
         await msg.answer(_(Text.field_required))
         return
+
+    grants = await user_dao.get_grants()
+    if not grants:
+        await msg.answer(_(Text.field_required))
+        return
+    await msg.answer(_(Text.grant_list), reply_markup=await grant_list_kb_gen(grants))
+    await state.set_state(States.list_grants)
+    await state.set_data({"root_message_id": msg.message_id + 1, "user_dao": user_dao})
 
     # try:
     #     res = await user_dal.get_cached() or await api.get_grant_result(user_dal)

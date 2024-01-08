@@ -10,6 +10,7 @@ from src.bot.callback import CreateGrantCallback
 from src.bot.callback import SelectTestTypeCallback
 from src.bot.keyboards.settings import create_grant_kb_gen
 from src.bot.keyboards.settings import create_test_type_kb_gen
+from src.bot.keyboards.settings import grant_list_kb_gen
 from src.bot.keyboards.settings import inline_cancel_kb_gen
 from src.bot.states import States
 from src.bot.text import Text
@@ -137,7 +138,12 @@ async def create_grant_set_ikt(msg: Message, state: FSMContext):
     await msg.delete()
     ikt = msg.text.strip()
     if not validate_ikt(ikt):
-        await msg.answer(_(Text.set_ikt_error_by_user))
+        await msg.bot.edit_message_text(
+            _(Text.set_ikt_error_by_user),
+            chat_id=msg.chat.id,
+            message_id=(await state.get_data())["root_message_id"],
+            reply_markup=await inline_cancel_kb_gen("create_grant"),
+        )
         return
     grant = (await state.get_data())["grant"]
     grant.ikt = ikt
@@ -160,7 +166,12 @@ async def create_grant_set_year(msg: Message, state: FSMContext, user_dao: UserD
     await msg.delete()
     year = msg.text.strip()
     if not validate_year(year):
-        await msg.answer(_(Text.set_year_error_by_user))
+        await msg.bot.edit_message_text(
+            _(Text.set_year_error_by_user),
+            chat_id=msg.chat.id,
+            message_id=(await state.get_data())["root_message_id"],
+            reply_markup=await inline_cancel_kb_gen("create_grant"),
+        )
         return
     grant = (await state.get_data())["grant"]
     grant.year = int(year)
@@ -203,9 +214,11 @@ async def create_grant(grant: Grant, msg, state) -> GrantDAO | None:
         _(Text.create_grant_success),
         chat_id=msg.chat.id,
         message_id=(await state.get_data())["root_message_id"],
-        reply_markup=None,
+        reply_markup=await grant_list_kb_gen(
+            await ((await state.get_data())["user_dao"].get_grants())
+        ),
     )
-    await state.clear()
+    await state.set_state(States.list_grants)
     return grant_dao
 
 

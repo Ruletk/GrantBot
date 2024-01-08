@@ -95,7 +95,13 @@ async def create_grant_kb_gen(state: FSMContext):
         text=checked(_(Text.set_type_btn), test_type_check),
         callback_data=CreateGrantCallback(type_="test_type").pack(),
     )
-    return InlineKeyboardMarkup(inline_keyboard=[[iin], [ikt], [year], [test_type]])
+    back = InlineKeyboardButton(
+        text=_(Text.back),
+        callback_data=CancelCallback(cancel_type="create_grant").pack(),
+    )
+    return InlineKeyboardMarkup(
+        inline_keyboard=[[iin], [ikt], [year], [test_type], [back]]
+    )
 
 
 def create_test_type_kb_gen():
@@ -122,7 +128,7 @@ async def inline_cancel_kb_gen(cancel_type: str):
     return InlineKeyboardMarkup(inline_keyboard=[[cancel]])
 
 
-def grant_list_kb_gen(grants: List[Grant]):
+async def grant_list_kb_gen(grants: List[Grant]):
     buttons = []
     for grant in grants:
         text = _(Text.grant_info_inline).format(
@@ -144,6 +150,14 @@ def grant_list_kb_gen(grants: List[Grant]):
 
 async def grant_list_action_kb_gen(ikt: str):
     buttons = [
+        [
+            InlineKeyboardButton(
+                text=_(Text.test_result_btn),
+                callback_data=GrantInfoActionCallback(
+                    action="get_result", ikt=ikt
+                ).pack(),
+            )
+        ],
         [
             InlineKeyboardButton(
                 text=_(Text.delete),

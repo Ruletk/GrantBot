@@ -58,7 +58,8 @@ class UserDAO:
 
     async def delete_user(self) -> None:
         logger.debug("Deleting user: %s", self.user)
-        pass
+        for grant in await self.get_grants():
+            await self.remove_grant(grant)
 
     async def confirm_policy(self) -> None:
         await self._update_user(policy_confirm=True)
@@ -70,7 +71,10 @@ class UserDAO:
 
     async def remove_grant(self, grant: Grant):
         logger.debug("Removing grant: %s for user %s", grant, self.user)
-        self.user.grants.remove(grant)
+        async with self.session() as session:
+            grant.is_active = 0
+            session.add(grant)
+            await session.commit()
         await self._save_user()
 
     async def get_grants(self):

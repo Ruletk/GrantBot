@@ -48,11 +48,14 @@ class GrantDAO:
     async def get_grant_by_ikt(self, ikt: str) -> Grant | None:
         """Find grant by ikt."""
         logger.debug("Getting grant by ikt: %s", ikt)
-        return await self._get_grant(ikt=ikt)
+        return await self._get_grant(ikt=ikt, is_active=1)
 
     async def get_cached(self) -> dict:
         logger.debug("Getting cached grant")
-        if self.grant.last_request.get("last_time") - time() < 60 * 30:
+        if (
+            self.grant.last_request
+            and self.grant.last_request.get("last_time") - time() < 60 * 30
+        ):
             return self.grant.last_request
         return await self._cache()
 
@@ -80,7 +83,7 @@ class GrantDAO:
         logger.debug("Getting grant result")
         data = await self.get_cached()
         if data.get("data", {}).get("hasGrant"):
-            return data.get("data", {})
+            return data.get("data", {}) | {"error_code": 0}
         return data
 
     async def get_type(self):
@@ -92,4 +95,5 @@ class GrantDAO:
     async def delete_grant(self):
         logger.info("Deleting grant: %s", self.grant)
         self.grant.is_active = 0
+        self.grant.last_request = None
         await self._save_grant()
