@@ -8,6 +8,12 @@ BOT_TOKEN = os.environ.get("BOT_TOKEN")
 # Database url
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
+# Redis
+REDIS_HOST = os.environ.get("REDIS_HOST")
+REDIS_PORT = os.environ.get("REDIS_PORT")
+REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD")
+
+# Logging settings
 LOG_SETTINGS = {
     "version": 1,
     "formatters": {
@@ -27,18 +33,24 @@ LOG_SETTINGS = {
             "filename": "logs/logs.log",
             "level": "DEBUG",
         },
+        "error_file_handler": {
+            "class": "logging.FileHandler",
+            "formatter": "default",
+            "filename": "logs/errors.log",
+            "level": "WARNING",
+        },
     },
     "loggers": {
         "aiogram": {
-            "handlers": ["console"],
+            "handlers": ["console", "error_file_handler"],
             "level": logging.DEBUG,
         },
         "sqlalchemy": {
-            "handlers": ["console"],
+            "handlers": ["console", "error_file_handler"],
             "level": logging.DEBUG,
         },
         "asyncpg": {
-            "handlers": ["console"],
+            "handlers": ["console", "error_file_handler"],
             "level": logging.DEBUG,
         },
         "src": {

@@ -1,15 +1,37 @@
+import logging
+from abc import ABC
 from typing import Any
 from typing import Awaitable
 from typing import Callable
 from typing import Coroutine
 from typing import Dict
+from typing import Optional
+from typing import Set
 
-from aiogram import BaseMiddleware
+from aiogram import BaseMiddleware as AbstractBaseMiddleware
+from aiogram import Router
 from aiogram.types import TelegramObject
 from aiogram.utils.i18n.middleware import I18nMiddleware
 
 from src.api.requester import Api
 from src.db.dao.UserDAO import UserDAO
+
+logger = logging.getLogger(__name__)
+
+
+class BaseMiddleware(AbstractBaseMiddleware, ABC):
+    def setup(
+        self: AbstractBaseMiddleware, router: Router, exclude: Optional[Set[str]] = None
+    ) -> AbstractBaseMiddleware:
+        """Register middleware for all events in the Router"""
+        if exclude is None:
+            exclude = set()
+        exclude_events = {"update", *exclude}
+        for event_name, observer in router.observers.items():
+            if event_name in exclude_events:
+                continue
+            observer.outer_middleware(self)
+        return self
 
 
 class ResourceMiddleware(BaseMiddleware):
@@ -63,6 +85,7 @@ class UserMiddleware(BaseMiddleware):
         If user not found, create new user.
 
         Then provide UserDAO instance."""
+        logger.debug("Providing user")
         user_dao = UserDAO()
         user = await user_dao.get_user_by_telegram_id(user_id)
 
@@ -75,13 +98,8 @@ class UserMiddleware(BaseMiddleware):
 
 
 class CustomI18NMiddleware(I18nMiddleware):
-    async def _get_user_dao(self, data) -> UserDAO:
-        user_dao = UserDAO()
-        await user_dao.get_user_by_telegram_id(data["event_from_user"].id)
-        return user_dao
-
     async def get_locale(self, event: TelegramObject, data: Dict[str, Any]) -> str:
         if "user_dao" not in data:
-            data["user_dao"] = await self._get_user_dao(data)
+            raise RuntimeError("UserDAO not found in data")
         lang = await data["user_dao"].get_user_language()
         return lang

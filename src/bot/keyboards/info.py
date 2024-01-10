@@ -6,7 +6,7 @@ from aiogram.utils.i18n import gettext as _
 from src.bot.text import Text
 
 
-def info_kb_gen(locale=None):
+async def info_kb_gen(locale=None):
     if not locale:
         locale = get_i18n().current_locale
     cancel = KeyboardButton(text=_(Text.cancel))

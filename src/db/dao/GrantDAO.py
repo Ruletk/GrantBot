@@ -14,10 +14,10 @@ logger = logging.getLogger(__name__)
 
 
 class GrantDAO:
-    def __init__(self):
+    def __init__(self, grant: Grant = None):
         logger.debug("Initializing")
         self.session = injector.get("session")
-        self.grant: Grant = None
+        self.grant: Grant = grant
 
     async def _get_grant(self, **kwargs) -> Grant | None:
         """Generalized method for getting grant by any field."""
@@ -64,7 +64,7 @@ class GrantDAO:
         logger.debug("Caching grant")
         async with Api() as api:
             try:
-                logger.debug("Caching grant, api: %s", api)
+                logger.debug("Sending response to api, api: %s", api)
                 data = await api.get_grant_result(self.grant)
 
                 if data.get("data", {}).get("hasGrant"):
@@ -87,7 +87,7 @@ class GrantDAO:
         return data
 
     async def get_type(self):
-        return _(Text.ent_types[self.grant.type - 1])
+        return _([Text.ent, Text.mag, Text.nkt][self.grant.type - 1])
 
     async def get_ikt(self):
         return self.grant.ikt

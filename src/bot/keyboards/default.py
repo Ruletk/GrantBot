@@ -5,17 +5,18 @@ from aiogram.types import ReplyKeyboardMarkup
 from aiogram.utils.i18n import get_i18n
 from aiogram.utils.i18n import gettext as _
 
+from src.bot.callback import CancelCallback
 from src.bot.text import Text
 
 
-def privacy_kb_gen(locale=None):
+async def privacy_kb_gen(locale=None):
     if not locale:
         locale = get_i18n().current_locale
     button_confirm = KeyboardButton(text=_(Text.policy_btn_confirm, locale=locale))
     return ReplyKeyboardMarkup(keyboard=[[button_confirm]], resize_keyboard=True)
 
 
-def default_kb_gen(locale=None):
+async def default_kb_gen(locale=None):
     if not locale:
         locale = get_i18n().current_locale
     button_settings = KeyboardButton(text=_(Text.settings_btn, locale=locale))
@@ -34,4 +35,8 @@ async def download_link_kb_gen(url, locale=None):
     download_link = InlineKeyboardButton(
         text=_(Text.download_link_btn, locale=locale), url=url
     )
-    return InlineKeyboardMarkup(inline_keyboard=[[download_link]])
+    back = InlineKeyboardButton(
+        text=_(Text.back, locale=locale),
+        callback_data=CancelCallback(cancel_type="list_grants").pack(),
+    )
+    return InlineKeyboardMarkup(inline_keyboard=[[download_link], [back]])

@@ -14,7 +14,7 @@ class User(ModelBase):
     __tablename__ = "users"
     JSON_ARGUMENTS = ("id", "telegram_id", "language", "grants")
 
-    telegram_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    telegram_id: Mapped[BigInteger] = mapped_column(BigInteger, primary_key=True)
     language: Mapped[str] = mapped_column(String(2), default="ru")
     policy_confirm: Mapped[bool] = mapped_column(Boolean, default=False)
 

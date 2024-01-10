@@ -2,6 +2,7 @@ import logging
 
 from sqlalchemy import select
 
+from src.db.dao.GrantDAO import GrantDAO
 from src.db.models.Grant import Grant
 from src.db.models.User import User
 from src.injector.injector import injector
@@ -71,10 +72,8 @@ class UserDAO:
 
     async def remove_grant(self, grant: Grant):
         logger.debug("Removing grant: %s for user %s", grant, self.user)
-        async with self.session() as session:
-            grant.is_active = 0
-            session.add(grant)
-            await session.commit()
+        grant_dao = GrantDAO(grant)
+        await grant_dao.delete_grant()
         await self._save_user()
 
     async def get_grants(self):
@@ -83,3 +82,7 @@ class UserDAO:
             stmt = select(Grant).filter_by(user_id=self.user.id, is_active=1)
             res = await session.execute(stmt)
             return res.scalars().all()
+
+    @property
+    def is_confirmed_policy(self) -> bool:
+        return self.user.policy_confirm

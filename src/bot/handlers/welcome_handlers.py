@@ -16,8 +16,13 @@ welcome_router = Router(name="welcome")
 
 
 @welcome_router.message(Command("start"))
-async def start_message(msg: Message):
-    await msg.answer(Text.welcome, reply_markup=language_kb)
+async def start_message(msg: Message, state: FSMContext, user_dao: UserDAO):
+    if not user_dao.is_confirmed_policy:
+        await msg.answer(Text.welcome, reply_markup=language_kb)
+        await States.language.set()
+        await state.update_data({"user_dao": user_dao})
+        return
+    await msg.answer(_(Text.welcome_back), reply_markup=await default_kb_gen())
 
 
 @welcome_router.message(F.text == "Русский язык")
@@ -26,7 +31,7 @@ async def russian_message(msg: Message, user_dao: UserDAO, state: FSMContext):
     await state.set_state(States.confirm_policy)
     await msg.answer(
         _(Text.policy, locale="ru").format(bot=Text.bot_name),
-        reply_markup=privacy_kb_gen(locale="ru"),
+        reply_markup=await privacy_kb_gen(locale="ru"),
     )
 
 
@@ -36,7 +41,7 @@ async def kazakh_message(msg: Message, user_dao: UserDAO, state: FSMContext):
     await state.set_state(States.confirm_policy)
     await msg.answer(
         _(Text.policy, locale="kk").format(bot=Text.bot_name),
-        reply_markup=privacy_kb_gen(locale="kk"),
+        reply_markup=await privacy_kb_gen(locale="kk"),
     )
 
 
@@ -44,5 +49,7 @@ async def kazakh_message(msg: Message, user_dao: UserDAO, state: FSMContext):
 async def confirm_privacy(msg: Message, user_dao: UserDAO, state: FSMContext):
     if msg.text == _(Text.policy_btn_confirm):
         await user_dao.confirm_policy()
-        await msg.answer(_(Text.policy_confirm_success), reply_markup=default_kb_gen())
+        await msg.answer(
+            _(Text.policy_confirm_success), reply_markup=await default_kb_gen()
+        )
         await state.clear()

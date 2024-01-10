@@ -3,9 +3,10 @@ from aiogram.fsm.state import StatesGroup
 
 
 class States(StatesGroup):
+    language = State()
+    settings = State()
     list_grants = State()
     create_grant = State()
-    set_type = State()
     set_ikt = State()
     set_iin = State()
     set_year = State()

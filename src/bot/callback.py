@@ -1,6 +1,11 @@
 from aiogram.filters.callback_data import CallbackData
 
 
+class SettingsCallback(CallbackData, prefix="settings"):
+    action: str
+    lang: str = "default"
+
+
 class CreateGrantCallback(CallbackData, prefix="create_grant"):
     type_: str
 
