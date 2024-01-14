@@ -15,6 +15,9 @@ class Api:
     def __init__(self):
         self._http_client = ClientSession()
 
+    def __str__(self):
+        return f"<Api(http_client={self._http_client})>"
+
     async def __aenter__(self):
         self._http_client = ClientSession()
         return self

@@ -7,17 +7,11 @@ from aiogram.utils.i18n import lazy_gettext as __
 from src.api.requester import Api
 from src.bot.keyboards.info import info_kb_gen
 from src.bot.keyboards.settings import grant_list_kb_gen
-from src.bot.keyboards.settings import settings_kb_gen
 from src.bot.states import States
 from src.bot.text import Text
 from src.db.dao.UserDAO import UserDAO
 
 main_router = Router(name="main")
-
-
-@main_router.message(lambda msg: msg.text == __(Text.settings_btn))
-async def settings_message_handler(msg: Message):
-    await msg.answer(_(Text.settings_menu), reply_markup=await settings_kb_gen())
 
 
 @main_router.message(lambda msg: msg.text == __(Text.test_result_btn))
@@ -29,10 +23,6 @@ async def get_grant_results(
         await msg.answer(_(Text.field_required))
         return
 
-    grants = await user_dao.get_grants()
-    if not grants:
-        await msg.answer(_(Text.field_required))
-        return
     await msg.answer(_(Text.grant_list), reply_markup=await grant_list_kb_gen(grants))
     await state.set_state(States.list_grants)
     await state.set_data({"root_message_id": msg.message_id + 1, "user_dao": user_dao})
@@ -61,4 +51,4 @@ async def get_grant_results(
 
 @main_router.message(lambda msg: msg.text == __(Text.info_btn))
 async def info_message_handler(msg: Message):
-    await msg.answer(_(Text.info_btn), reply_markup=info_kb_gen())
+    await msg.answer(_(Text.info_btn), reply_markup=await info_kb_gen())

@@ -1,17 +1,26 @@
-FROM python:3.11-alpine
+# Install dependencies stage
+FROM python:3.11.0-slim AS builder
 
-WORKDIR /bot
+WORKDIR /app
 
-COPY requirements.txt .
-COPY src src/
-COPY locales locales/
-COPY run.py .
-
-
-RUN python3 -m pip install --upgrade pip
-RUN python3 -m pip install -r requirements.txt --no-cache-dir
+COPY pyproject.toml poetry.lock ./
+RUN python3 -m pip install poetry
+RUN poetry config virtualenvs.in-project true  && \
+    poetry install --no-dev
 
 
-RUN pybabel compile -d locales
+# Final stage
+FROM python:3.11.0-slim
 
-CMD python3 /bot/run.py
+WORKDIR /app
+
+COPY --from=builder /app/.venv /app/.venv
+COPY src/ /app/src
+COPY locales/ /app/locales
+COPY run.py /app/run.py
+COPY .env /app/.env
+
+ENV PATH="/app/.venv/bin:$PATH"
+RUN mkdir /app/logs
+
+CMD ["python", "run.py"]

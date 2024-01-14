@@ -3,8 +3,6 @@ from typing import List
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton
 from aiogram.types import InlineKeyboardMarkup
-from aiogram.types import KeyboardButton
-from aiogram.types import ReplyKeyboardMarkup
 from aiogram.utils.i18n import gettext as _
 
 from src.bot.callback import CancelCallback
@@ -12,59 +10,44 @@ from src.bot.callback import CreateGrantCallback
 from src.bot.callback import GrantInfoActionCallback
 from src.bot.callback import ListGrantCallback
 from src.bot.callback import SelectTestTypeCallback
+from src.bot.callback import SettingsCallback
 from src.bot.text import Text
 from src.db.models.Grant import Grant
 
 
-async def settings_kb_gen():
-    create = KeyboardButton(text=_(Text.add_grant))
-    list = KeyboardButton(text=_(Text.list_grants))
-    change_lang = KeyboardButton(text=_(Text.set_change_lang_btn))
-    delete_me = KeyboardButton(text=_(Text.delete_me_btn))
-    cancel = KeyboardButton(text=_(Text.cancel))
+async def settings_kb_gen(locale=None):
+    create_grant = InlineKeyboardButton(
+        text=_(Text.add_grant),
+        callback_data=SettingsCallback(action="create_grant").pack(),
+    )
+    list_grant = InlineKeyboardButton(
+        text=_(Text.list_grants),
+        callback_data=SettingsCallback(action="list_grants").pack(),
+    )
+    change_lang = InlineKeyboardButton(
+        text=_(Text.set_change_lang_btn),
+        callback_data=SettingsCallback(action="change_lang").pack(),
+    )
+    delete_me = InlineKeyboardButton(
+        text=_(Text.delete_me_btn),
+        callback_data=SettingsCallback(action="delete_me").pack(),
+    )
 
-    return ReplyKeyboardMarkup(
-        keyboard=[[create, list], [change_lang], [delete_me], [cancel]],
-        resize_keyboard=True,
+    return InlineKeyboardMarkup(
+        inline_keyboard=[[create_grant, list_grant], [change_lang], [delete_me]],
     )
 
 
-def cancel_kb_gen():
-    back = KeyboardButton(text=_(Text.back))
-    return ReplyKeyboardMarkup(
-        keyboard=[
-            [
-                back,
-            ],
-        ],
-        resize_keyboard=True,
+async def delete_me_kb_gen():
+    sure = InlineKeyboardButton(
+        text=_(Text.confirm_deletion_btn),
+        callback_data=SettingsCallback(action="delete_me_sure").pack(),
     )
-
-
-def type_kb_gen():
-    ent = InlineKeyboardButton(text=_(Text.set_ent_btn), callback_data="set_type_ent")
-    mag = InlineKeyboardButton(text=_(Text.set_mag_btn), callback_data="set_type_mag")
-    nkt = InlineKeyboardButton(text=_(Text.set_nkt_btn), callback_data="set_type_nkt")
-    return InlineKeyboardMarkup(inline_keyboard=[[ent], [mag], [nkt]])
-
-
-def delete_me_kb_gen():
-    sure = KeyboardButton(text=_(Text.confirm_deletion_btn))
-    back = KeyboardButton(text=_(Text.back))
-    return ReplyKeyboardMarkup(keyboard=[[sure], [back]], resize_keyboard=True)
-
-
-def grants_kb_gen(grants: List[Grant]):
-    buttons = []
-    for grant in grants:
-        text = _(Text.grant_info).format(
-            ikt=grant.iin, code=grant.ikt, result=grant.year
-        )
-        buttons.append(
-            InlineKeyboardButton(text=text, callback_data=f"grant_{grant.ikt}")
-        )
-    # buttons.append(KeyboardButton(text=_(Text.back)))
-    # return ReplyKeyboardMarkup(keyboard=[buttons], resize_keyboard=True)
+    back = InlineKeyboardButton(
+        text=_(Text.back),
+        callback_data=CancelCallback(cancel_type="to_settings").pack(),
+    )
+    return InlineKeyboardMarkup(inline_keyboard=[[sure], [back]])
 
 
 async def create_grant_kb_gen(state: FSMContext):
@@ -80,15 +63,15 @@ async def create_grant_kb_gen(state: FSMContext):
         return f"❌ {text}"
 
     iin = InlineKeyboardButton(
-        text=checked(_(Text.set_iin_btn), iin_check),
+        text=checked(_(Text.iin), iin_check),
         callback_data=CreateGrantCallback(type_="iin").pack(),
     )
     ikt = InlineKeyboardButton(
-        text=checked(_(Text.set_ikt_btn), ikt_check),
+        text=checked(_(Text.ikt), ikt_check),
         callback_data=CreateGrantCallback(type_="ikt").pack(),
     )
     year = InlineKeyboardButton(
-        text=checked(_(Text.set_year_btn), year_check),
+        text=checked(_(Text.year), year_check),
         callback_data=CreateGrantCallback(type_="year").pack(),
     )
     test_type = InlineKeyboardButton(
@@ -97,24 +80,24 @@ async def create_grant_kb_gen(state: FSMContext):
     )
     back = InlineKeyboardButton(
         text=_(Text.back),
-        callback_data=CancelCallback(cancel_type="create_grant").pack(),
+        callback_data=CancelCallback(cancel_type="to_settings").pack(),
     )
     return InlineKeyboardMarkup(
         inline_keyboard=[[iin], [ikt], [year], [test_type], [back]]
     )
 
 
-def create_test_type_kb_gen():
+async def create_test_type_kb_gen():
     ent = InlineKeyboardButton(
-        text=_(Text.set_ent_btn),
+        text=_(Text.ent),
         callback_data=SelectTestTypeCallback(type_="ent").pack(),
     )
     mag = InlineKeyboardButton(
-        text=_(Text.set_mag_btn),
+        text=_(Text.mag),
         callback_data=SelectTestTypeCallback(type_="mag").pack(),
     )
     nkt = InlineKeyboardButton(
-        text=_(Text.set_nkt_btn),
+        text=_(Text.nkt),
         callback_data=SelectTestTypeCallback(type_="nkt").pack(),
     )
     return InlineKeyboardMarkup(inline_keyboard=[[ent], [mag], [nkt]])
@@ -135,7 +118,7 @@ async def grant_list_kb_gen(grants: List[Grant]):
             iin=grant.iin,
             ikt=grant.ikt,
             year=grant.year,
-            test_type=_(Text.ent_types[grant.type - 1]),
+            test_type=_([Text.ent, Text.mag, Text.nkt][grant.type - 1]),
         )
         buttons.append(
             [
@@ -144,6 +127,14 @@ async def grant_list_kb_gen(grants: List[Grant]):
                 )
             ]
         )
+    buttons.append(
+        [
+            InlineKeyboardButton(
+                text=_(Text.back),
+                callback_data=CancelCallback(cancel_type="to_settings").pack(),
+            )
+        ]
+    )
 
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
@@ -172,4 +163,24 @@ async def grant_list_action_kb_gen(ikt: str):
         ],
     ]
 
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+async def grant_delete_sure_kb_gen(ikt: str):
+    buttons = [
+        [
+            InlineKeyboardButton(
+                text=_(Text.yes),
+                callback_data=GrantInfoActionCallback(
+                    action="delete_sure", ikt=ikt
+                ).pack(),
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                text=_(Text.back),
+                callback_data=CancelCallback(cancel_type="list_grants").pack(),
+            )
+        ],
+    ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)

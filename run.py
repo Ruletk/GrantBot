@@ -12,6 +12,10 @@ async def main():
     await dp.start_polling(bot)
 
 
-if __name__ == "__main__":
+def start_app():
     initialize()
     asyncio.run(main())
+
+
+if __name__ == "__main__":
+    start_app()

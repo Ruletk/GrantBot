@@ -9,14 +9,13 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
 from src.db.models.Base import ModelBase
-from src.db.models.User import User
 
 
 class Grant(ModelBase):
     __tablename__ = "grants"
     JSON_ARGUMENTS = ("iin", "ikt", "year", "type", "last_request", "is_active")
 
-    ikt: Mapped[str] = mapped_column(String, nullable=False)
+    ikt: Mapped[str] = mapped_column(String, nullable=False, index=True)
     year: Mapped[int] = mapped_column(Integer, nullable=False)
     type: Mapped[int] = mapped_column(
         Integer, nullable=False
@@ -43,3 +42,18 @@ class Grant(ModelBase):
         return (
             f"<Grant(id={self.id}, ikt={'*' * 6}{self.ikt[-3:]}, user={self.user_id})"
         )
+
+    def __init__(
+        self,
+        iin: str = None,
+        ikt: str = None,
+        year: int = None,
+        type_: int = None,
+        user_id: int = None,
+    ):
+        self.iin = iin
+        self.ikt = ikt
+        self.year = year
+        self.type = type_
+        self.user_id = user_id
+        super().__init__()

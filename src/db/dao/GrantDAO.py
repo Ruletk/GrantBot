@@ -9,15 +9,14 @@ from src.bot.text import Text
 from src.db.models.Grant import Grant
 from src.injector.injector import injector
 
-
 logger = logging.getLogger(__name__)
 
 
 class GrantDAO:
-    def __init__(self):
+    def __init__(self, grant: Grant = None):
         logger.debug("Initializing")
         self.session = injector.get("session")
-        self.grant: Grant = None
+        self.grant: Grant = grant
 
     async def _get_grant(self, **kwargs) -> Grant | None:
         """Generalized method for getting grant by any field."""
@@ -39,9 +38,11 @@ class GrantDAO:
         {setattr(self.grant, key, value) for key, value in kwargs.items()}  # noqa
         await self._save_grant()
 
-    async def create_grant(self, grant: Grant) -> Grant | None:
+    async def create_grant(self, grant: Grant = None) -> Grant | None:
         logger.debug("Creating grant: %s", grant)
-        self.grant = grant
+        if self.grant is None and grant is None:
+            raise ValueError("Grant should be filled")
+        self.grant = grant or self.grant
         await self._save_grant()
         return self.grant
 
@@ -64,7 +65,7 @@ class GrantDAO:
         logger.debug("Caching grant")
         async with Api() as api:
             try:
-                logger.debug("Caching grant, api: %s", api)
+                logger.debug("Sending response to api, api: %s", api)
                 data = await api.get_grant_result(self.grant)
 
                 if data.get("data", {}).get("hasGrant"):
@@ -87,7 +88,7 @@ class GrantDAO:
         return data
 
     async def get_type(self):
-        return _(Text.ent_types[self.grant.type - 1])
+        return _([Text.ent, Text.mag, Text.nkt][self.grant.type - 1])
 
     async def get_ikt(self):
         return self.grant.ikt
