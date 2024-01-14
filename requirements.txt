@@ -1,6 +1,0 @@
-aiogram==3.0.0b9
-alembic==1.11.1
-SQLAlchemy==2.0.19
-asyncpg==0.28.0
-Babel==2.9.1
-pre-commit==3.3.3
