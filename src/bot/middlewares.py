@@ -20,6 +20,9 @@ logger = logging.getLogger(__name__)
 
 
 class BaseMiddleware(AbstractBaseMiddleware, ABC):
+    """Base middleware for all middlewares in the project
+    Provides setup method for registering middleware for all events in the Router"""
+
     def setup(
         self: AbstractBaseMiddleware, router: Router, exclude: Optional[Set[str]] = None
     ) -> AbstractBaseMiddleware:
@@ -41,7 +44,7 @@ class ResourceMiddleware(BaseMiddleware):
         event: TelegramObject,
         data: Dict[str, Any],
     ) -> Coroutine[Any, Any, Any]:
-        resources = await self._provide_resources()
+        resources = await self._provide_api_client()
         data.update(resources)
 
         result = await handler(event, data)
@@ -50,36 +53,35 @@ class ResourceMiddleware(BaseMiddleware):
         return result
 
     @staticmethod
-    async def _provide_api_client() -> Api:
+    async def _provide_api_client() -> dict:
         client = Api()
-        return client
+        return {"api": client}
 
-    async def _provide_resources(self) -> dict:
-        api_client = await self._provide_api_client()
-
-        resources = {"api": api_client}
-        return resources
-
-    async def _cleanup(self, data: dict):
+    @staticmethod
+    async def _cleanup(data: dict):
         if "api" in data:
             api: Api = data["api"]
             await api.close_session()
 
 
 class UserMiddleware(BaseMiddleware):
+    """Middleware for creating or getting user from database.
+    Automatically provide UserDAO instance."""
+
     async def __call__(
         self,
         handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
         event: TelegramObject,
         data: Dict[str, Any],
     ) -> Coroutine[Any, Any, Any]:
-        data = await self._provide_user(data.get("event_from_user").id, data)
+        data = await self._provide_user(data)
 
         res = await handler(event, data)
 
         return res
 
-    async def _provide_user(self, user_id: int, data: dict) -> dict:
+    @staticmethod
+    async def _provide_user(data: dict) -> dict:
         """Provide user from database.
         Get user from DB by telegram_id.
         If user not found, create new user.
@@ -87,10 +89,14 @@ class UserMiddleware(BaseMiddleware):
         Then provide UserDAO instance."""
         logger.debug("Providing user")
         user_dao = UserDAO()
+
+        user_id = data.get("event_from_user").id
+        chat_id = data.get("event_chat").id
+
         user = await user_dao.get_user_by_telegram_id(user_id)
 
         if user is None:
-            await user_dao.create_user(user_id)
+            await user_dao.create_user(user_id, chat_id)
 
         data["user_dao"] = user_dao
 
@@ -98,6 +104,8 @@ class UserMiddleware(BaseMiddleware):
 
 
 class CustomI18NMiddleware(I18nMiddleware):
+    """Provide language for messages"""
+
     async def get_locale(self, event: TelegramObject, data: Dict[str, Any]) -> str:
         if "user_dao" not in data:
             raise RuntimeError("UserDAO not found in data")

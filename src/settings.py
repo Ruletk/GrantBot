@@ -2,6 +2,11 @@
 import logging.config
 import os
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
 # Token for bot
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
 

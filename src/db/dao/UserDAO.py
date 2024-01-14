@@ -42,10 +42,10 @@ class UserDAO:
         logger.debug("Getting user by telegram id: %s", telegram_id)
         return await self._get_user(telegram_id=telegram_id)
 
-    async def create_user(self, telegram_id: int) -> User | None:
+    async def create_user(self, telegram_id: int, chat_id: int) -> User | None:
         """Create user by telegram id."""
         logger.debug("Creating user by telegram id: %s", telegram_id)
-        self.user = User(telegram_id=telegram_id)
+        self.user = User(telegram_id=telegram_id, chat_id=chat_id)
         await self._save_user()
         return self.user
 

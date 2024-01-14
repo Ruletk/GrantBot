@@ -9,7 +9,6 @@ from src.bot.text import Text
 from src.db.models.Grant import Grant
 from src.injector.injector import injector
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -39,9 +38,11 @@ class GrantDAO:
         {setattr(self.grant, key, value) for key, value in kwargs.items()}  # noqa
         await self._save_grant()
 
-    async def create_grant(self, grant: Grant) -> Grant | None:
+    async def create_grant(self, grant: Grant = None) -> Grant | None:
         logger.debug("Creating grant: %s", grant)
-        self.grant = grant
+        if self.grant is None and grant is None:
+            raise ValueError("Grant should be filled")
+        self.grant = grant or self.grant
         await self._save_grant()
         return self.grant
 

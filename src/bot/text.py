@@ -13,7 +13,8 @@ class Text:
     grant_info = _("ИИН: {iin}\nИКТ: {ikt}\nГод: {year}\nТип: {test_type}")
     bot_name = ""
     welcome = _("Привет. Выбери язык")
-    language_change = _("Язык успешно изменен")
+    language_choose = _("Выберите язык")
+    language_change_success = _("Язык успешно изменен")
     settings_menu = _("Меню настроек")
     results_not_found = _("Результаты конкурса грантов не найдены.")
 

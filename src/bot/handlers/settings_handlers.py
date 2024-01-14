@@ -2,6 +2,7 @@ import asyncio
 
 from aiogram import F
 from aiogram.dispatcher.router import Router
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from aiogram.utils.i18n import gettext as _
@@ -26,7 +27,10 @@ async def settings_message_handler(msg: Message, state: FSMContext, user_dao: Us
     last_settings_message_id = (await state.get_data()).get("last_settings_message_id")
     if last_settings_message_id:
         for msg_id in last_settings_message_id:
-            await msg.bot.delete_message(chat_id=msg.chat.id, message_id=msg_id)
+            try:
+                await msg.bot.delete_message(chat_id=msg.chat.id, message_id=msg_id)
+            except TelegramBadRequest:
+                pass
 
     await state.update_data(
         {
@@ -88,7 +92,7 @@ async def change_lang_settings(
     lang = callback_data.lang
     if lang == "default":
         await callback.message.bot.edit_message_text(
-            _(Text.language_change),
+            _(Text.language_choose),
             chat_id=callback.message.chat.id,
             message_id=data.get("root_message_id"),
             reply_markup=await language_kb_gen(),
@@ -100,7 +104,7 @@ async def change_lang_settings(
     )
 
     await callback.message.bot.send_message(
-        text=_(Text.language_change, locale=lang),
+        text=_(Text.language_change_success, locale=lang),
         chat_id=callback.message.chat.id,
         reply_markup=await default_kb_gen(locale=lang),
     )
